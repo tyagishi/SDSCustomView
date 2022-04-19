@@ -9,8 +9,10 @@ Usually we don't mind width value itself, but want to align leading/center/traii
 
 We want to see layout like
 
+```
  123
    1
+```
 
 You can easily achieve above layout with
 ```
