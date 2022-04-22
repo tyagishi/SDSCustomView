@@ -9,7 +9,7 @@ Usually we don't mind width value itself, but want to align leading/center/traii
 
 We want to see layout like
 
-<img alt="FixedWidthLabel" src="https://user-images.githubusercontent.com/6419800/163898941-a9f8ad45-a30c-421b-9afe-9473749696e5.png" width=30% >
+<img width=30% alt="FixedWidthLabel" src="https://user-images.githubusercontent.com/6419800/164699567-ec2592c4-3191-4b7e-8f4e-b137b62dd488.png">
 
 You can easily achieve above layout with
 ```
