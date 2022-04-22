@@ -14,12 +14,12 @@ We want to see layout like
 You can easily achieve above layout with
 ```
 VStack {
-  FixedWidthLabel("123", "0000").alignment(.trailing)
-  FixedWidthLabel(  "1", "0000").alignment(.trailing)
+  FixedWidthLabel("123",widthFor: "0000").alignment(.trailing)
+  FixedWidthLabel(  "1",widthFor: "0000").alignment(.trailing)
 }
 ```
 
-basically above is equal to  followings
+basically above is equivalent with following.
 ```
 VStack {
     Text("0000")
