@@ -4,10 +4,10 @@ convenience view collection
 
 ## FixedWidthLabel
 
-Sometimes we want to have fixed-width labels.
-Usually we don't mind width value itself, but want to align leading/center/traiing.
+Sometimes we want to have fixed-width label"s" those have same width.
+Usually we don't mind width value itself, but want to align leading/center/traiing in same width.
 
-We want to see layout like
+looks like following.
 
 <img width=30% alt="FixedWidthLabel" src="https://user-images.githubusercontent.com/6419800/164699567-ec2592c4-3191-4b7e-8f4e-b137b62dd488.png">
 
