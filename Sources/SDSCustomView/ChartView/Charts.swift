@@ -34,7 +34,6 @@ public struct Charts<tContent: View, legendView: View>: View {
                 PolylineView(datum, canvas: datum.canvas)
             }
         }
-        .debugBorder(Color.green)
     }
 }
 
