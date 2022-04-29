@@ -13,14 +13,14 @@ public class GraphData: ObservableObject {
     @Published var graphDatum: [PolylineGraphDatum]
     @Published var xRange: ClosedRange<Double>
     
-    public init(_ datum: PolylineGraphDatum) {
+    public init(_ datum: PolylineGraphDatum, xRange: ClosedRange<Double>? = nil) {
         self.graphDatum = [datum]
-        xRange = datum.xValueRange
+        self.xRange = xRange ?? datum.xValueRange
     }
     
-    public init(_ data: [PolylineGraphDatum]) {
+    public init(_ data: [PolylineGraphDatum], xRange: ClosedRange<Double>) {
         self.graphDatum = data
-        xRange = data.first?.xValueRange ?? ClosedRange(uncheckedBounds: (0,100))
+        self.xRange = xRange
     }
 }
 
@@ -31,7 +31,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     @Published var yValueRange: ClosedRange<Double>
     let vertexSymbol: AnyView
     @Published var lineColor: Color
-    @Published var canvas: SDSCanvas
+    @Published public var canvas: SDSCanvas
     let labelOffset: CGVector
     let labelXValus: [CGFloat]
     let labelXFormatter: ((CGFloat)->String)
@@ -79,13 +79,14 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         return SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
     }
     
-    func suitableCanvas(for size: CGSize,
-                        xRangeValue: ClosedRange<Double>,
-                        xLowerPadding: CGFloat = 0.0,
-                        xUpperPadding: CGFloat = 0.0,
-                        yLowerPadding: CGFloat = 0.0,
-                        yUpperPadding: CGFloat = 0.0) -> SDSCanvas {
-        let adjustedXRange = xRangeValue.expand(toLower: xLowerPadding, toUpper: xUpperPadding)
+    static public func suitableCanvasFor(_ size: CGSize,
+                                         xValueRange: ClosedRange<Double>,
+                                         yValueRange: ClosedRange<Double>,
+                                         xLowerPadding: CGFloat = 0.0,
+                                         xUpperPadding: CGFloat = 0.0,
+                                         yLowerPadding: CGFloat = 0.0,
+                                         yUpperPadding: CGFloat = 0.0) -> SDSCanvas {
+        let adjustedXRange = xValueRange.expand(toLower: xLowerPadding, toUpper: xUpperPadding)
         let adjustedYRange = yValueRange.expand(toLower: yLowerPadding, toUpper: yUpperPadding)
 
         let xyScale = CGVector(dx: size.width / adjustedXRange.width,
@@ -95,11 +96,11 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         return SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
     }
     
-    func suitableCanvas(for size: CGSize,
-                        xLowerPadding: CGFloat = 0.0,
-                        xUpperPadding: CGFloat = 0.0,
-                        yLowerPadding: CGFloat = 0.0,
-                        yUpperPadding: CGFloat = 0.0) -> SDSCanvas {
+    public func suitableCanvas(for size: CGSize,
+                               xLowerPadding: CGFloat = 0.0,
+                               xUpperPadding: CGFloat = 0.0,
+                               yLowerPadding: CGFloat = 0.0,
+                               yUpperPadding: CGFloat = 0.0) -> SDSCanvas {
         let adjustedXRange = xValueRange.expand(toLower: xLowerPadding, toUpper: xUpperPadding)
         let adjustedYRange = yValueRange.expand(toLower: yLowerPadding, toUpper: yUpperPadding)
         let xyScale = CGVector(dx: size.width / adjustedXRange.width,

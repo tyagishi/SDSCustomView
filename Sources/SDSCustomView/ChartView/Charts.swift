@@ -10,18 +10,37 @@ import SDSCGExtension
 import SDSViewExtension
 import SwiftUIDebugUtil
 
+
+public struct ChartsPushOut: View{
+    @ObservedObject var graphData: GraphData
+//    var title: (() -> tContent)
+//    let size: CGSize
+//    let legend: (() -> legendView)
+    
+    public init(_ graphData: GraphData) {
+//                @ViewBuilder title: @escaping () -> tContent,
+//                @ViewBuilder legend: @escaping () -> legendView) {
+        self.graphData = graphData
+//        self.title =
+//        self.legend = legend
+    }
+    
+    public var body: some View {
+        GeometryReader { geom in
+            Charts(graphData, title: {Text("Title")}, legend: {EmptyView().anyView()})
+        }
+    }
+}
+
 public struct Charts<tContent: View, legendView: View>: View {
     @ObservedObject var graphData: GraphData
     var title: tContent
-    let size: CGSize
     let legend: legendView
     
     public init(_ graphData: GraphData,
-                size: CGSize,
                 @ViewBuilder title: () -> tContent,
                 @ViewBuilder legend: () -> legendView) {
         self.graphData = graphData
-        self.size = size
         self.title = title()
         self.legend = legend()
     }
