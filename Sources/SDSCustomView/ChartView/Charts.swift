@@ -135,12 +135,13 @@ struct PolylineView: View {
                         datum.vertexSymbol
                             .position(canvas.locOnCanvas(data.loc))
                             .foregroundColor(datum.lineColor)
-                        Text("\(data.loc.y, specifier: "%.1f")")
+                        Text(datum.valueYLabelFormatter(data.loc.y))
+//                        Text("\(data.loc.y, specifier: "%.1f")")
                             .position(canvas.locOnCanvas(data.loc).move(datum.labelOffset))
-                        .font(.footnote)
-
+                            .foregroundColor(datum.lineColor)
+                            .font(.footnote)
                     }
-                    XAxisView(canvas: canvas,labelValues: datum.labelXValus, xFormatter: datum.labelXFormatter)
+                    XAxisView(canvas: canvas,labelValues: datum.axisXValus, xFormatter: datum.axisXLabelFormatter)
                     //YAxisView(canvas: canvas)
                 } else {
                     Text("No data for graph")
