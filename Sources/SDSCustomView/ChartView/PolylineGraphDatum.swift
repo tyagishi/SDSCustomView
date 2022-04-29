@@ -22,6 +22,8 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     let axisXLabelFormatter: ((CGFloat)->String)
     
     let valueYLabelFormatter: ((CGFloat)->String)
+    
+    let tooltipFormatter: (CGPoint) -> String
 
     public init(_ dataSet: [DataPoint],
                 color: Color = Color.red, vertexSymbol: () -> AnyView,
@@ -30,7 +32,8 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
                 labelOffset: CGVector = .zero,
                 axisXValus: [CGFloat] = [],
                 axisXLabelFormatter: @escaping ((CGFloat)->String) = {_ in ""},
-                valueYLabelFormatter: @escaping ((CGFloat) -> String) = {_ in ""}) {
+                valueYLabelFormatter: @escaping ((CGFloat) -> String) = {_ in ""},
+                tooltipFormatter: @escaping((CGPoint)->String) = {_ in ""} ) {
         precondition(size != .zero || canvas != nil)
         self.dataPoints = dataSet
         self.lineColor = color
@@ -44,6 +47,8 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         self.axisXLabelFormatter = axisXLabelFormatter
         
         self.valueYLabelFormatter = valueYLabelFormatter
+        
+        self.tooltipFormatter = tooltipFormatter
         
         if let canvas = canvas {
             self.canvas = canvas
