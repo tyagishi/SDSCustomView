@@ -22,4 +22,11 @@ public class GraphData: ObservableObject {
         self.graphDatum = data
         self.xRange = xRange
     }
+    
+    public func hasEnoughData() -> Bool {
+        for datum in graphDatum {
+            guard datum.hasEnoughData() else { return false }
+        }
+        return true
+    }
 }

@@ -53,8 +53,14 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         if let canvas = canvas {
             self.canvas = canvas
         } else {
-            let adjustedXRange = calcedXValueRange.expand(toLower: calcedXValueRange.width * 0.1 , toUpper: calcedXValueRange.width * 0.1)
-            let adjustedYRange = calcedYValueRange.expand(toLower: calcedYValueRange.height * 0.1, toUpper: calcedYValueRange.height * 0.1)
+            var adjustedXRange = calcedXValueRange.expand(toLower: calcedXValueRange.width * 0.1 , toUpper: calcedXValueRange.width * 0.1)
+            if adjustedXRange.width <= 10 {
+                adjustedXRange = adjustedXRange.expand(toLower: 50, toUpper: 50)
+            }
+            var adjustedYRange = calcedYValueRange.expand(toLower: calcedYValueRange.height * 0.1, toUpper: calcedYValueRange.height * 0.1)
+            if adjustedYRange.height <= 10 {
+                adjustedYRange = adjustedYRange.expand(toLower: 50, toUpper: 50)
+            }
             let xyScale = CGVector(dx: size.width / adjustedXRange.width,
                                    dy: size.height / adjustedYRange.height)
             let llPoint = CGPoint(x: adjustedXRange.lowerBound,
@@ -67,6 +73,10 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         get {
             dataPoints
         }
+    }
+    
+    public func hasEnoughData() -> Bool {
+        return !dataPoints.isEmpty
     }
     
     func suitableTestCanvas(for size: CGSize) -> SDSCanvas {
