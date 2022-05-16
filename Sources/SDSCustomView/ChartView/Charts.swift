@@ -50,7 +50,7 @@ struct XAxisView: View {
             ForEach(labelValues, id: \.self) { value in
                 Text(xFormatter(value))
                     .position(x: canvas.invertedY(point:canvas.locOnCanvas(.init(x: value, y: canvas.llValueY))).x,
-                              y: canvas.canvasHeight/2.0)
+                              y: canvas.canvasHeight*4/5.0)
                     .font(.footnote)
             }
         }
