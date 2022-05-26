@@ -4,10 +4,15 @@ convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
 - ChartView   
+
    polyline graph
+   
 - FixedWidthLabel
+
    Fixed width Text with using template string
+   
 - TableView
+
    wrapped NSTableView in NSScrollView
 
 ## TableView
