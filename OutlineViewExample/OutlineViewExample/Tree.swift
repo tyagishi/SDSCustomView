@@ -40,17 +40,6 @@ public class TreeNode<T>: Identifiable {
     
 }
 
-extension TreeNode {
-
-}
-//extension TreeNode: Hashable where T == Equatable{
-//    public static func == (lhs: TreeNode<T>, rhs: TreeNode<T>) -> Bool {
-//        lhs == rhs
-//    }
-//
-//
-//}
-
 extension TreeNode where T: Equatable {
     public func removeChild(_ node: TreeNode<T>) -> TreeNode<T>? {
         guard let index = children.firstIndex(where: {$0.value == node.value}) else { return nil }
@@ -64,16 +53,6 @@ extension TreeNode where T: Equatable {
         
         return parentIndex.appending(myIndex)
     }
-    
-    public func isAncestor(of node: TreeNode<T>) -> Bool {
-        var parent = node.parent
-        while parent != nil {
-            if parent!.value == node.value { return true }
-            parent = parent!.parent
-        }
-        return false
-    }
-
 }
 
 extension TreeNode {
