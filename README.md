@@ -14,6 +14,10 @@ every view is already used for app but basically all views are under develop for
 - TableView
 
    wrapped NSTableView in NSScrollView
+   
+- OutlineView
+
+  wrapped NSOutlineView in NSScrollView   
 
 ## TableView
 currently only for macOS
