@@ -81,7 +81,7 @@ class DataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, Obse
         } else {
             toIndex = IndexPath(indexes: [index])
         }
-        print("fromIndex: \(fromIndex) toIndex: \(toIndex)")
+        //print("fromIndex: \(fromIndex) toIndex: \(toIndex)")
         objectWillChange.send()
         data.move(from: fromIndex, to: toIndex)
         return true

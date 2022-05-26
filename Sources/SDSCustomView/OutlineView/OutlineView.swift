@@ -56,7 +56,7 @@ public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDele
     
     public func updateNSView(_ nsView: NSScrollView, context: Context) {
         guard let outlineView = nsView.documentView as? NSOutlineView else { return }
-        print(#function)
+        //print(#function)
         outlineView.reloadData()
     }
     
