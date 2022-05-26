@@ -20,9 +20,7 @@ public class TreeNode<T>: Identifiable {
     public init(value: T, children: [TreeNode]) {
         self.value = value
         self.children = children
-        for child in children {
-            child.parent = self
-        }
+        _ = children.map({$0.parent = self})
     }
 
     public func addChild(_ node: TreeNode<T>, index: Int = -1) {
@@ -62,8 +60,7 @@ extension TreeNode {
             return children[indexPath.first!]
         }
         let firstIndex = indexPath.first!
-        var nextIndexPath = indexPath
-        nextIndexPath.removeFirst()
+        let nextIndexPath = indexPath[1...]
         return children[firstIndex].node(at: nextIndexPath)
     }
 }
