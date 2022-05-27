@@ -9,8 +9,13 @@ import Foundation
 import SwiftUI
 
 #if os(macOS)
+public protocol OutlineViewDataSourceUpdate {
+    func update()
+}
+
+
 @available(macOS 12, *)
-public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDelegate & ObservableObject>: NSViewRepresentable {
+public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDelegate & ObservableObject & OutlineViewDataSourceUpdate>: NSViewRepresentable {
     @ObservedObject var dataModel: DataModel
     let outlineViewSetup: ((NSOutlineView) -> Void)?
     let scrollViewSetup: ((NSScrollView) -> Void)?
@@ -28,11 +33,14 @@ public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDele
     }
     
     
-    final public class Coordinator<DataModel: NSOutlineViewDataSource & NSOutlineViewDelegate>: NSObject {
+    final public class Coordinator<DataModel: NSOutlineViewDataSource & NSOutlineViewDelegate & OutlineViewDataSourceUpdate>: NSObject {
         var outlineViewData: DataModel
 
         init(_ data: DataModel) {
             self.outlineViewData = data
+        }
+        func update() {
+            outlineViewData.update()
         }
     }
     
@@ -57,6 +65,7 @@ public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDele
     public func updateNSView(_ nsView: NSScrollView, context: Context) {
         guard let outlineView = nsView.documentView as? NSOutlineView else { return }
         //print(#function)
+        context.coordinator.update()
         outlineView.reloadData()
     }
     

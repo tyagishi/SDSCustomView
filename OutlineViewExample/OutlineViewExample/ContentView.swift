@@ -32,7 +32,8 @@ struct ContentView: View {
     }
 }
 
-class DataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, ObservableObject {
+class DataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, ObservableObject, OutlineViewDataSourceUpdate {
+    
     @Published var data = TreeNode(value: "root", children: [ TreeNode(value: "Child1"),
                                                               TreeNode(value: "Child2", children: [ TreeNode(value: "GrandChild1"),
                                                                                                     TreeNode(value: "GrandChild2")]),
@@ -40,7 +41,8 @@ class DataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, Obse
                                                                                                     TreeNode(value: "GrandChildB")
                                                                                                   ])
                                                             ] )
-    
+    func update() { }
+
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
         guard let element = item as? TreeNode<String> else { return data.children.count }
         return element.children.count
