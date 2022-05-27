@@ -67,6 +67,15 @@ public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDele
         //print(#function)
         context.coordinator.update()
         outlineView.reloadData()
+        if outlineView.autosaveExpandedItems,
+           let autosaveName = outlineView.autosaveName,
+           let persistentObjects = UserDefaults.standard.array(forKey: "NSOutlineView Items \(autosaveName)"),
+           let itemIds = persistentObjects as? [String] {
+            itemIds.forEach {
+                let item = outlineView.dataSource?.outlineView?(outlineView, itemForPersistentObject: $0)
+                outlineView.expandItem(item)
+            }
+        }
     }
     
     public typealias NSViewType = NSScrollView
