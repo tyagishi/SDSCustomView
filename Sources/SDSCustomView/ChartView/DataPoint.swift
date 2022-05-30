@@ -21,10 +21,7 @@ public struct DataPoint: Identifiable {
 
     static public func randomSample(_ num: Int, yRange: ClosedRange<Double>, xScale: Double = 1, yScale: Double = 1) -> [DataPoint] {
         var dPoints:[DataPoint] = []
-        for index in 0..<num {
-            let newLoc = DataPoint(CGPoint(x: Double(index) * xScale, y: Double.random(in: yRange) * yScale))
-            dPoints.append(newLoc)
-        }
+        _ = (0..<num).map({DataPoint(CGPoint(x: Double($0) * xScale, y: Double.random(in: yRange) * yScale))}).map({dPoints.append($0)})
         return dPoints
     }
 }
