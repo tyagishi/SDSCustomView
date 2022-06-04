@@ -49,6 +49,9 @@ public struct TableView<DataModel: NSTableViewDataSource & NSTableViewDelegate &
     
     public func updateNSView(_ nsView: NSScrollView, context: Context) {
         guard let tableView = nsView.documentView as? NSTableView else { return }
+        context.coordinator.dataModel = self.dataModel
+        tableView.dataSource = self.dataModel
+        tableView.delegate = self.dataModel
         tableView.reloadData()
     }
     

@@ -65,6 +65,9 @@ public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDele
     public func updateNSView(_ nsView: NSScrollView, context: Context) {
         guard let outlineView = nsView.documentView as? NSOutlineView else { return }
         //print(#function)
+        context.coordinator.outlineViewData = self.dataModel
+        outlineView.dataSource = self.dataModel
+        outlineView.delegate = self.dataModel
         context.coordinator.update()
         outlineView.reloadData()
         if outlineView.autosaveExpandedItems,
