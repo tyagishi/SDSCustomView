@@ -93,7 +93,9 @@ public struct XAxisView: View {
     let color: Color
     let labelValues: [CGFloat]
     let formatter: ((CGFloat)->String)?
-    
+
+    @State private var offset = CGSize.zero
+
     public init(canvas: SDSCanvas, axisValue: CGFloat, axisEnds: (from: CGFloat, to: CGFloat), color: Color,
                 labelValues: [CGFloat], formatter: ((CGFloat)->String)? = nil) {
         self.canvas = canvas
@@ -115,9 +117,11 @@ public struct XAxisView: View {
             if let formatter = formatter {
                 ForEach(labelValues, id: \.self) { value in
                     Text(formatter(value))
-                        .position(canvas.locOnCanvas(.init(x: value, y: axisValue)))
+                        .readGeom(onChange: { geomProxy in
+                            offset = geomProxy.size
+                        })
+                        .position(canvas.locOnCanvas(.init(x: value, y: axisValue)).move(offset.width * 0, offset.height * 1))
                         .font(.footnote)
-                        .offset(x: 0, y: 10)
                 }
             }
         }
@@ -130,6 +134,8 @@ public struct YAxisView: View {
     let color: Color
     let labelValues: [CGFloat]
     let formatter: ((CGFloat)->String)?
+
+    @State private var offset = CGSize.zero
 
     public init(canvas: SDSCanvas, axisValue: CGFloat, axisEnds: (from: CGFloat, to: CGFloat), color: Color,
                 labelValues: [CGFloat], formatter: ((CGFloat)->String)? = nil) {
@@ -152,9 +158,11 @@ public struct YAxisView: View {
             if let formatter = formatter {
                 ForEach(labelValues, id: \.self) { value in
                     Text(formatter(value))
-                        .position(canvas.locOnCanvas(.init(x: axisValue, y: value)))
+                        .readGeom(onChange: { geomProxy in
+                            offset = geomProxy.size
+                        })
+                        .position(canvas.locOnCanvas(.init(x: axisValue, y: value)).move(offset.width * -1, offset.height * 0))
                         .font(.footnote)
-                        .offset(x: -15, y: 0)
                 }
             }
         }
