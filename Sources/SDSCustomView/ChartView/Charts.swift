@@ -11,27 +11,43 @@ import SDSViewExtension
 import SwiftUIDebugUtil
 
 public struct AxisInfo {
-    let axisValue: CGFloat // another axis value
+    let axisValue: CGFloat // for X-Axis, this is Y-Value,for Y-Axis other way around
     let axisEnds: (from: CGFloat, to: CGFloat)
     let color: Color
     let labelValues: [CGFloat] // value in data coordinate
-    let formatter: (CGFloat) -> String
+    let formatter: ((CGFloat) -> String)?
     public init(axisValue: CGFloat, axisEnds: (from: CGFloat, to: CGFloat),
-                color: Color, labelValues: [CGFloat], formatter: @escaping (CGFloat) -> String) {
+                color: Color, labelValues: [CGFloat], formatter: ((CGFloat) -> String)? = nil) {
         self.axisValue = axisValue
         self.axisEnds = axisEnds
         self.color = color
         self.labelValues = labelValues
         self.formatter = formatter
     }
-    
-    
 }
+
+public struct GridInfo {
+    let axisValues: [CGFloat] // for grid along X-Axis, these are Y-Values,for Y-Axis other way around
+    let axisEnds: (from: CGFloat, to: CGFloat)
+    let color: Color
+    public init(axisValues: [CGFloat], axisEnds: (from: CGFloat, to: CGFloat),
+                color: Color) {
+        self.axisValues = axisValues
+        self.axisEnds = axisEnds
+        self.color = color
+    }
+}
+
 
 public enum AxisConfig {
     case none
-    case coordinateValue(AxisInfo) // in draw coordinate
+    //case coordinateValue(AxisInfo) // in draw coordinate // will be implemented in future version
     case plotValue(AxisInfo) // value in data coordinate
+}
+
+public enum GridConfig {
+    case none
+    case plotValues(GridInfo) // value in data coordinate
 }
 
 public struct Charts<tContent: View, legendView: View>: View {
@@ -40,16 +56,21 @@ public struct Charts<tContent: View, legendView: View>: View {
     let legend: legendView
     let xAxis: AxisConfig
     let yAxis: AxisConfig
-    
+    let xGrid: GridConfig
+    let yGrid: GridConfig
+
     public init(_ graphData: GraphData,
                 @ViewBuilder title: () -> tContent,
                 @ViewBuilder legend: () -> legendView,
-                xAxis: AxisConfig, yAxis: AxisConfig) {
+                xAxis: AxisConfig, yAxis: AxisConfig,
+                xGrid: GridConfig, yGrid: GridConfig) {
         self.graphData = graphData
         self.title = title()
         self.legend = legend()
         self.xAxis = xAxis
         self.yAxis = yAxis
+        self.xGrid = xGrid
+        self.yGrid = yGrid
     }
     
     public var body: some View {
@@ -57,53 +78,84 @@ public struct Charts<tContent: View, legendView: View>: View {
             title
             legend
             ForEach(graphData.graphDatum) { datum in
-                PolylineView(datum, canvas: datum.canvas, xAxis: xAxis, yAxis: yAxis)
+                PolylineView(datum, canvas: datum.canvas, xAxis: xAxis, yAxis: yAxis,
+                             xGrid: xGrid, yGrid: yGrid)
             }
         }
     }
 }
 
 
-struct XAxisView: View {
+public struct XAxisView: View {
     let canvas: SDSCanvas
     let axisValue: CGFloat
     let axisEnds: (from: CGFloat, to: CGFloat)
+    let color: Color
     let labelValues: [CGFloat]
-    let formatter: ((CGFloat)->String)
-    var body: some View {
+    let formatter: ((CGFloat)->String)?
+    
+    public init(canvas: SDSCanvas, axisValue: CGFloat, axisEnds: (from: CGFloat, to: CGFloat), color: Color,
+                labelValues: [CGFloat], formatter: ((CGFloat)->String)? = nil) {
+        self.canvas = canvas
+        self.axisValue = axisValue
+        self.axisEnds = axisEnds
+        self.color = color
+        self.labelValues = labelValues
+        self.formatter = formatter
+    }
+
+    public var body: some View {
         ZStack {
             Path { context in
                 context.move(to: canvas.locOnCanvas(.init(x: axisEnds.from, y: axisValue)))
                 context.addLine(to: canvas.locOnCanvas(.init(x: axisEnds.to, y: axisValue)))
             }
             .stroke(lineWidth: 1.0)
-            ForEach(labelValues, id: \.self) { value in
-                Text(formatter(value))
-                    .position(canvas.locOnCanvas(.init(x: value, y: axisValue)))
-                    .font(.footnote)
-                    .offset(x: 0, y: 10)
+            .fill(color)
+            if let formatter = formatter {
+                ForEach(labelValues, id: \.self) { value in
+                    Text(formatter(value))
+                        .position(canvas.locOnCanvas(.init(x: value, y: axisValue)))
+                        .font(.footnote)
+                        .offset(x: 0, y: 10)
+                }
             }
         }
     }
 }
-struct YAxisView: View {
+public struct YAxisView: View {
     let canvas: SDSCanvas
     let axisValue: CGFloat
     let axisEnds: (from: CGFloat, to: CGFloat)
+    let color: Color
     let labelValues: [CGFloat]
-    let formatter: ((CGFloat)->String)
-    var body: some View {
+    let formatter: ((CGFloat)->String)?
+
+    public init(canvas: SDSCanvas, axisValue: CGFloat, axisEnds: (from: CGFloat, to: CGFloat), color: Color,
+                labelValues: [CGFloat], formatter: ((CGFloat)->String)? = nil) {
+        self.canvas = canvas
+        self.axisValue = axisValue
+        self.axisEnds = axisEnds
+        self.color = color
+        self.labelValues = labelValues
+        self.formatter = formatter
+    }
+
+    public var body: some View {
         ZStack {
             Path { context in
                 context.move(to: canvas.locOnCanvas(.init(x: axisValue, y: axisEnds.from)))
                 context.addLine(to: canvas.locOnCanvas(.init(x: axisValue, y: axisEnds.to)))
             }
             .stroke(lineWidth: 1.0)
-            ForEach(labelValues, id: \.self) { value in
-                Text(formatter(value))
-                    .position(canvas.locOnCanvas(.init(x: axisValue, y: value)))
-                    .font(.footnote)
-                    .offset(x: -15, y: 0)
+            .fill(color)
+            if let formatter = formatter {
+                ForEach(labelValues, id: \.self) { value in
+                    Text(formatter(value))
+                        .position(canvas.locOnCanvas(.init(x: axisValue, y: value)))
+                        .font(.footnote)
+                        .offset(x: -15, y: 0)
+                }
             }
         }
             
@@ -115,12 +167,18 @@ struct PolylineView: View {
     let canvas: SDSCanvas
     let xAxis: AxisConfig
     let yAxis: AxisConfig
+    let xGrid: GridConfig
+    let yGrid: GridConfig
 
-    init(_ datum: PolylineGraphDatum, canvas: SDSCanvas, xAxis: AxisConfig, yAxis: AxisConfig) {
+    init(_ datum: PolylineGraphDatum, canvas: SDSCanvas,
+         xAxis: AxisConfig, yAxis: AxisConfig,
+         xGrid: GridConfig, yGrid: GridConfig) {
         self.datum = datum
         self.canvas = canvas
         self.xAxis = xAxis
         self.yAxis = yAxis
+        self.xGrid = xGrid
+        self.yGrid = yGrid
     }
     
     var body: some View {
@@ -153,19 +211,26 @@ struct PolylineView: View {
                     Text("No data for graph")
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
-                if case .none = xAxis {
-                } else if case .coordinateValue(let info) = xAxis {
-                    // not implemented
-                } else if case .plotValue(let info) = xAxis {
-                    XAxisView(canvas: canvas , axisValue: info.axisValue, axisEnds: (info.axisEnds.from, info.axisEnds.to),
+                if case .plotValue(let info) = xAxis {
+                    XAxisView(canvas: canvas , axisValue: info.axisValue, axisEnds: (info.axisEnds.from, info.axisEnds.to), color: .black,
                               labelValues: info.labelValues, formatter: info.formatter)
                 }
-                if case .none = yAxis {
-                } else if case .coordinateValue(let info) = yAxis {
-                    // not implemented
-                } else if case .plotValue(let info) = yAxis {
-                    YAxisView(canvas: canvas , axisValue: info.axisValue, axisEnds: (info.axisEnds.from, info.axisEnds.to),
+                if case .plotValues(let gridInfo) = yGrid {
+                    ForEach(gridInfo.axisValues, id: \.self) { gridValue in
+                        XAxisView(canvas: canvas, axisValue: gridValue, axisEnds: gridInfo.axisEnds,
+                                  color: gridInfo.color, labelValues: [], formatter: { _ in ""})
+                    }
+                }
+
+                if case .plotValue(let info) = yAxis {
+                    YAxisView(canvas: canvas , axisValue: info.axisValue, axisEnds: (info.axisEnds.from, info.axisEnds.to), color: .black,
                               labelValues: info.labelValues, formatter: info.formatter)
+                }
+                if case .plotValues(let gridInfo) = xGrid {
+                    ForEach(gridInfo.axisValues, id: \.self) { gridValue in
+                        YAxisView(canvas: canvas, axisValue: gridValue, axisEnds: gridInfo.axisEnds,
+                                  color: gridInfo.color, labelValues: [], formatter: { _ in ""})
+                    }
                 }
             }
         }
