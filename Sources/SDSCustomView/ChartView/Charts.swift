@@ -215,7 +215,7 @@ struct PolylineView: View {
                     XAxisView(canvas: canvas , axisValue: info.axisValue, axisEnds: (info.axisEnds.from, info.axisEnds.to), color: .black,
                               labelValues: info.labelValues, formatter: info.formatter)
                 }
-                if case .plotValues(let gridInfo) = yGrid {
+                if case .plotValues(let gridInfo) = xGrid {
                     ForEach(gridInfo.axisValues, id: \.self) { gridValue in
                         XAxisView(canvas: canvas, axisValue: gridValue, axisEnds: gridInfo.axisEnds,
                                   color: gridInfo.color, labelValues: [], formatter: { _ in ""})
@@ -226,7 +226,7 @@ struct PolylineView: View {
                     YAxisView(canvas: canvas , axisValue: info.axisValue, axisEnds: (info.axisEnds.from, info.axisEnds.to), color: .black,
                               labelValues: info.labelValues, formatter: info.formatter)
                 }
-                if case .plotValues(let gridInfo) = xGrid {
+                if case .plotValues(let gridInfo) = yGrid {
                     ForEach(gridInfo.axisValues, id: \.self) { gridValue in
                         YAxisView(canvas: canvas, axisValue: gridValue, axisEnds: gridInfo.axisEnds,
                                   color: gridInfo.color, labelValues: [], formatter: { _ in ""})
