@@ -18,10 +18,8 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     @Published var lineColor: Color
     @Published public var canvas: SDSCanvas
     let labelOffset: CGVector
-    let axisXValus: [CGFloat]
-    let axisXLabelFormatter: ((CGFloat)->String)
     
-    let valueYLabelFormatter: ((CGFloat)->String)
+    let valueLabelFormatter: ((CGPoint)->String)
     
     let tooltipFormatter: (CGPoint) -> String
 
@@ -30,9 +28,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
                 xValueRange: ClosedRange<Double>? = nil, yValueRange: ClosedRange<Double>? = nil,
                 size: CGSize = CGSize.zero, canvas: SDSCanvas? = nil,
                 labelOffset: CGVector = .zero,
-                axisXValus: [CGFloat] = [],
-                axisXLabelFormatter: @escaping ((CGFloat)->String) = {_ in ""},
-                valueYLabelFormatter: @escaping ((CGFloat) -> String) = {_ in ""},
+                valueLabelFormatter: @escaping ((CGPoint) -> String) = {_ in ""},
                 tooltipFormatter: @escaping((CGPoint)->String) = {_ in ""} ) {
         precondition(size != .zero || canvas != nil)
         self.dataPoints = dataSet
@@ -43,10 +39,8 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         self.xValueRange = calcedXValueRange
         self.yValueRange = calcedYValueRange
         self.labelOffset = labelOffset
-        self.axisXValus = axisXValus
-        self.axisXLabelFormatter = axisXLabelFormatter
         
-        self.valueYLabelFormatter = valueYLabelFormatter
+        self.valueLabelFormatter = valueLabelFormatter
         
         self.tooltipFormatter = tooltipFormatter
         

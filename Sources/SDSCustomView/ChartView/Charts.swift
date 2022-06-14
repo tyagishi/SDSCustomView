@@ -209,7 +209,7 @@ struct PolylineView: View {
                         datum.vertexSymbol
                             .position(canvas.locOnCanvas(data.loc))
                             .foregroundColor(datum.lineColor)
-                        Text(datum.valueYLabelFormatter(data.loc.y))
+                        Text(datum.valueLabelFormatter(data.loc))
                             .help(datum.tooltipFormatter(data.loc))
                             .position(canvas.locOnCanvas(data.loc).move(datum.labelOffset))
                             .foregroundColor(datum.lineColor)
