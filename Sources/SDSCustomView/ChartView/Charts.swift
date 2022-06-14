@@ -161,7 +161,7 @@ public struct YAxisView: View {
                         .readGeom(onChange: { geomProxy in
                             offset = geomProxy.size
                         })
-                        .position(canvas.locOnCanvas(.init(x: axisValue, y: value)).move(offset.width * -1, offset.height * 0))
+                        .position(canvas.locOnCanvas(.init(x: axisValue, y: value)).move(offset.width * -2.2, offset.height * 0))
                         .font(.footnote)
                 }
             }
