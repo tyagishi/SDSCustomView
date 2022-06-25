@@ -10,44 +10,35 @@ import SwiftUI
 
 #if os(macOS)
 public protocol OutlineViewDataSourceUpdate {
-    func update()
+    func update() -> Bool // return value: reload needed?
 }
 
+public protocol OutlineViewCoordinator: NSOutlineViewDataSource, NSOutlineViewDelegate, OutlineViewDataSourceUpdate {}
 
 @available(macOS 12, *)
-public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDelegate & ObservableObject & OutlineViewDataSourceUpdate>: NSViewRepresentable {
-    @ObservedObject var dataModel: DataModel
+public struct OutlineView<DataSource: ObservableObject>: NSViewRepresentable {
+    @ObservedObject var dataModel: DataSource
     let outlineViewSetup: ((NSOutlineView) -> Void)?
     let scrollViewSetup: ((NSScrollView) -> Void)?
+    let coordinator: OutlineViewCoordinator
 
-    public init(_ dataModel: DataModel,
+    public init(_ dataModel: DataSource,
+                coordinator: OutlineViewCoordinator,
                 outlineViewSetup: ((NSOutlineView) -> Void)? = nil,
                 scrollViewSetup: ((NSScrollView) -> Void)? = nil) {
         self.dataModel = dataModel
+        self.coordinator = coordinator
         self.outlineViewSetup = outlineViewSetup
         self.scrollViewSetup = scrollViewSetup
     }
     
-    public func makeCoordinator() -> Coordinator<DataModel> {
-        return Coordinator(dataModel)
+    public func makeCoordinator() -> OutlineViewCoordinator {
+        return self.coordinator
     }
-    
-    
-    final public class Coordinator<DataModel: NSOutlineViewDataSource & NSOutlineViewDelegate & OutlineViewDataSourceUpdate>: NSObject {
-        var outlineViewData: DataModel
-
-        init(_ data: DataModel) {
-            self.outlineViewData = data
-        }
-        func update() {
-            outlineViewData.update()
-        }
-    }
-    
     public func makeNSView(context: Context) -> NSScrollView {
         let outlineView = NSOutlineView()
-        outlineView.dataSource = context.coordinator.outlineViewData
-        outlineView.delegate = context.coordinator.outlineViewData
+        outlineView.dataSource = context.coordinator
+        outlineView.delegate = context.coordinator
         
         outlineViewSetup?(outlineView)
 
@@ -64,12 +55,9 @@ public struct OutlineView<DataModel: NSOutlineViewDataSource & NSOutlineViewDele
     
     public func updateNSView(_ nsView: NSScrollView, context: Context) {
         guard let outlineView = nsView.documentView as? NSOutlineView else { return }
-        //print(#function)
-        context.coordinator.outlineViewData = self.dataModel
-        outlineView.dataSource = self.dataModel
-        outlineView.delegate = self.dataModel
-        context.coordinator.update()
-        outlineView.reloadData()
+        if context.coordinator.update() {
+            outlineView.reloadData()
+        }
         if outlineView.autosaveExpandedItems,
            let autosaveName = outlineView.autosaveName,
            let persistentObjects = UserDefaults.standard.array(forKey: "NSOutlineView Items \(autosaveName)"),
