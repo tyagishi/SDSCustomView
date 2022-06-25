@@ -12,7 +12,9 @@ struct ContentView: View {
     @StateObject var dataSource: DataSource = DataSource()
     var body: some View {
         VStack {
-            OutlineView(dataSource, outlineViewSetup: { outlineView in
+            OutlineView(dataSource,
+                        coordinator: dataSource,
+                        outlineViewSetup: { outlineView in
                 let column1 = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("1st"))
                 column1.title = "1st"
                 outlineView.addTableColumn(column1)
@@ -33,9 +35,7 @@ struct ContentView: View {
 }
 
 
-class OutlineCoordinator: NSOutlineViewDelegate
-
-class DataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, ObservableObject, OutlineViewDataSourceUpdate {
+class DataSource: NSObject, OutlineViewCoordinator, ObservableObject {
     
     @Published var data = TreeNode(value: "root", children: [ TreeNode(value: "Child1"),
                                                               TreeNode(value: "Child2", children: [ TreeNode(value: "GrandChild1"),
@@ -44,7 +44,7 @@ class DataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, Obse
                                                                                                     TreeNode(value: "GrandChildB")
                                                                                                   ])
                                                             ] )
-    func update() { }
+    func update() -> Bool { true }
 
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
         guard let element = item as? TreeNode<String> else { return data.children.count }
