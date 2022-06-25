@@ -32,6 +32,9 @@ struct ContentView: View {
     }
 }
 
+
+class OutlineCoordinator: NSOutlineViewDelegate
+
 class DataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, ObservableObject, OutlineViewDataSourceUpdate {
     
     @Published var data = TreeNode(value: "root", children: [ TreeNode(value: "Child1"),
