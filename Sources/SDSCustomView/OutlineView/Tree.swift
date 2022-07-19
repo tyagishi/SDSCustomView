@@ -94,11 +94,13 @@ extension TreeNode where T: Equatable {
     public func move(from: IndexPath, to: IndexPath) {
         if from == to { return }
         let fromNode = self.node(at: from)
+        //print(fromNode.value)
         var newParent = to
         newParent.removeLast()
         let newParentNode = self.node(at: newParent)
         _ = fromNode.parent?.removeChild(fromNode)
         let insertIndex = to.last!
         newParentNode.addChild(fromNode, index: insertIndex)
+        //print(newParentNode.value)
     }
 }
