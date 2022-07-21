@@ -3,21 +3,23 @@
 convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
-- ChartView   
+- ChartView (pure SwiftUI)
 
    polyline graph
    
-- FixedWidthLabel
+- FixedWidthLabel (pure SwiftUI)
 
    Fixed width Text with using template string
    
-- TableView
+- TableView (based on AppKit)
 
    wrapped NSTableView in NSScrollView
    
-- OutlineView
+- OutlineView (based on AppKit)
 
   wrapped NSOutlineView in NSScrollView   
+  
+- OutlineView with Drag&Drop support(pure SwiftUI)  
 
 ## TableView
 currently only for macOS
@@ -61,3 +63,9 @@ Just for reducing boilerplates.
 
 Note: it is NOT ultimately fixed width label.
 in case user modify their text size setting, label width would be affected.
+
+
+## FixedWidthLabel
+
+Sometimes we want to have fixed-width label"s" those have same width.
+Usually we don't mind width value itself, but want to align leading/center/traiing in same width.
