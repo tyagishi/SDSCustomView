@@ -142,7 +142,7 @@ struct DragDelegate<T>: DropDelegate {
 //    }
     func performDrop(info: DropInfo) -> Bool {
         //print("performDrop")
-        guard let draggingItem = draggingItem else { return false }
+        guard let _ = draggingItem else { return false }
 //        if item.id == draggingItem.id {
         self.draggingItem = nil
 //        }
