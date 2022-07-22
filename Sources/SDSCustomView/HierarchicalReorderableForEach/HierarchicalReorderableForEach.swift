@@ -11,26 +11,28 @@ import SDSDataStructure
 
 let dragType = [UTType.text]
 
-public struct HierarchicalReorderableForEach<T: Equatable>: View {
+public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View {
     @ObservedObject var current: TreeNode<T>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
     var moveAction: (IndexPath, IndexPath) -> Void
+    let content: (TreeNode<T>) -> Content
 
     public init( current: TreeNode<T>,
-          childKey: ReferenceWritableKeyPath<TreeNode<T>,[TreeNode<T>]>,
-          draggingItem: Binding<TreeNode<T>?>,
-          moveAction: @escaping (IndexPath, IndexPath) -> Void) {
+                 childKey: ReferenceWritableKeyPath<TreeNode<T>,[TreeNode<T>]>,
+                 draggingItem: Binding<TreeNode<T>?>,
+                 moveAction: @escaping (IndexPath, IndexPath) -> Void,
+                 @ViewBuilder content: @escaping (TreeNode<T>) -> Content ) {
         self.current = current
         self.childKey = childKey
         self._draggingItem = draggingItem
         self.moveAction = moveAction
+        self.content = content
     }
     public var body: some View {
         ForEach(current[keyPath: childKey]) { child in
-            HierarchicalReorderableRow(child, \.children, $draggingItem, moveAction: { (from, to) in
-                current.rootNode().move(from: from, to: to)
-            }, content: { treeNode in
+            HierarchicalReorderableRow(child, \.children, $draggingItem, moveAction: moveAction,
+                                       content: { treeNode in
                 Text(treeNode.value as? String ?? "NoText")
             })
         }
@@ -49,8 +51,8 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     @ObservedObject var node: TreeNode<T>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
-    let content: (TreeNode<T>) -> Content
     var moveAction: (IndexPath, IndexPath) -> Void
+    let content: (TreeNode<T>) -> Content
 
     @State private var expand = false
     
@@ -90,7 +92,8 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
             if expand,
                !node.children.isEmpty {
                 HierarchicalReorderableForEach(current: node, childKey: \.children,
-                                               draggingItem: $draggingItem, moveAction: {(_,_) in })
+                                               draggingItem: $draggingItem, moveAction: {(_,_) in },
+                                               content: content)
             }
         }
         .padding(.leading, CGFloat((node.indexPath().count - 1) * 8))
@@ -116,14 +119,14 @@ struct DragDelegate<T>: DropDelegate {
     func dropEntered(info: DropInfo) {
         guard let draggingItem = draggingItem else { return }
         guard draggingItem.id != item.id else { return }
-        print("dropEntered")
+        //print("dropEntered")
 
         if draggingItem.isAncestor(of: item) { return }
         
         let fromNodeIndex = draggingItem.indexPath()
         var toNodeIndex = item.indexPath()
         
-        print("DropEntered from: \(fromNodeIndex) to: \(toNodeIndex)")
+        //print("DropEntered from: \(fromNodeIndex) to: \(toNodeIndex)")
         
         if item.children.isEmpty {
             // drop empty node, add as child
