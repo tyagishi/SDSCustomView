@@ -15,14 +15,14 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
     @ObservedObject var current: TreeNode<T>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
-    var moveAction: (IndexPath, IndexPath) -> Void
+    var moveAction: ((IndexPath, IndexPath) -> Void)?
     let content: (TreeNode<T>) -> Content
 
 
     public init( current: TreeNode<T>,
                  childKey: ReferenceWritableKeyPath<TreeNode<T>,[TreeNode<T>]>,
                  draggingItem: Binding<TreeNode<T>?>,
-                 moveAction: @escaping (IndexPath, IndexPath) -> Void,
+                 moveAction: ((IndexPath, IndexPath) -> Void)?,
                  @ViewBuilder content: @escaping (TreeNode<T>) -> Content ) {
         self.current = current
         self.childKey = childKey
@@ -52,7 +52,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     @ObservedObject var node: TreeNode<T>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
-    var moveAction: (IndexPath, IndexPath) -> Void
+    var moveAction: ((IndexPath, IndexPath) -> Void)?
     let content: (TreeNode<T>) -> Content
 
     @State private var expand = false {
@@ -64,7 +64,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     public init(_ node: TreeNode<T>,
                 _ childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>,
                 _ draggingItem: Binding<TreeNode<T>?>,
-                moveAction: @escaping (IndexPath, IndexPath) -> Void,
+                moveAction: ((IndexPath, IndexPath) -> Void)?,
                 @ViewBuilder content: @escaping (TreeNode<T>) -> Content ) {
         self.node = node
         self.childKey = childKey
@@ -76,24 +76,33 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
-                    .onTapGesture {
-                        expand.toggle()
-                    }
-                content(node).frame(maxWidth: .infinity, alignment: .leading)
-//                    .overlay(draggingItem?.id == node.id ? Color.white.opacity(0.8) : Color.clear)
+            if moveAction == nil {
+                HStack {
+                    Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
+                        .onTapGesture {
+                            expand.toggle()
+                        }
+                    content(node).frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.bottom, 8)
+            } else {
+                HStack {
+                    Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
+                        .onTapGesture {
+                            expand.toggle()
+                        }
+                    content(node).frame(maxWidth: .infinity, alignment: .leading)
+                        .onDrag {
+                            self.draggingItem = node
+                            return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
+                        }
+                        .onDrop(of: dragType, delegate: DragDelegate<T>(root: node.rootNode(),
+                                                                        item: node,
+                                                                        draggingItem: $draggingItem,
+                                                                        moveAction: moveAction))
+                }
+                .padding(.bottom, 8)
             }
-//            .contentShape(Rectangle())
-            .onDrag {
-                self.draggingItem = node
-                return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
-            }
-            .onDrop(of: dragType, delegate: DragDelegate<T>(root: node.rootNode(),
-                                                            item: node,
-                                                            draggingItem: $draggingItem,
-                                                            moveAction: moveAction))
-            .padding(.bottom, 8)
             if expand,
                !node.children.isEmpty {
                 HierarchicalReorderableForEach(current: node, childKey: \.children,
@@ -103,18 +112,50 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
         }
         .padding(.leading, CGFloat((node.indexPath().count - 1) * 8))
     }
+    
+    @ViewBuilder
+    var row: some View {
+        HStack {
+            Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
+                .onTapGesture {
+                    expand.toggle()
+                }
+            content(node).frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.bottom, 8)
+    }
+    
+    @ViewBuilder
+    var moveRow: some View {
+        HStack {
+            Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
+                .onTapGesture {
+                    expand.toggle()
+                }
+            content(node).frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .onDrag {
+            self.draggingItem = node
+            return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
+        }
+        .onDrop(of: dragType, delegate: DragDelegate<T>(root: node.rootNode(),
+                                                        item: node,
+                                                        draggingItem: $draggingItem,
+                                                        moveAction: moveAction))
+        .padding(.bottom, 8)
+    }
 }
 
 struct DragDelegate<T>: DropDelegate {
     @ObservedObject var root: TreeNode<T>
     let item: TreeNode<T>
     @Binding var draggingItem: TreeNode<T>?
-    var moveAction: (IndexPath, IndexPath) -> Void
+    var moveAction: ((IndexPath, IndexPath) -> Void)?
 
     init(root: TreeNode<T>,
          item: TreeNode<T>,
          draggingItem: Binding<TreeNode<T>?>,
-         moveAction: @escaping (IndexPath, IndexPath) -> Void ) {
+         moveAction: ((IndexPath, IndexPath) -> Void)? ) {
         self.root = root
         self.item = item
         self._draggingItem = draggingItem
@@ -122,12 +163,10 @@ struct DragDelegate<T>: DropDelegate {
     }
     
     func dropEntered(info: DropInfo) {
-        guard let draggingItem = draggingItem else { return }
-        guard draggingItem.id != item.id else { return }
-        //print("dropEntered")
+        guard let draggingItem = draggingItem,
+              item.id != draggingItem.id,
+              !draggingItem.isAncestor(of: item) else { return }
 
-        if draggingItem.isAncestor(of: item) { return }
-        
         let fromNodeIndex = draggingItem.indexPath()
         var toNodeIndex = item.indexPath()
         
@@ -138,30 +177,30 @@ struct DragDelegate<T>: DropDelegate {
             toNodeIndex.append(IndexPath(index: 0))
         }
         if fromNodeIndex != toNodeIndex {
-            moveAction(fromNodeIndex, toNodeIndex)
+            moveAction?(fromNodeIndex, toNodeIndex)
             //root.move(from: fromNodeIndex, to: toNodeIndex)
         }
     }
     
-//    func validateDrop(info: DropInfo) -> Bool {
-//        guard let draggingItem = draggingItem else { return false }
-//        //guard draggingItem.id != item.id else { return false }
-//        return true
-//    }
+    func validateDrop(info: DropInfo) -> Bool {
+        guard let draggingItem = draggingItem,
+              item.id != draggingItem.id,
+              !draggingItem.isAncestor(of: item) else { return false }
+        return true
+    }
     func performDrop(info: DropInfo) -> Bool {
         //print("performDrop")
-        guard let _ = draggingItem else { return false }
-//        if item.id == draggingItem.id {
+        guard let draggingItem = draggingItem,
+              item.id != draggingItem.id,
+              !draggingItem.isAncestor(of: item) else { return false }
         self.draggingItem = nil
-//        }
         return true
     }
     
     func dropUpdated(info: DropInfo) -> DropProposal? {
-//        print("dropUpdated at \(item.value)")
-        guard let draggingItem = draggingItem else { return nil }
-        if item.id == draggingItem.id { return nil }
-        if draggingItem.isAncestor(of: item) { return nil }
+        guard let draggingItem = draggingItem,
+              item.id != draggingItem.id,
+              !draggingItem.isAncestor(of: item) else { return nil }
         return DropProposal(operation: .move)
     }
     
