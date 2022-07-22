@@ -33,7 +33,7 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
         ForEach(current[keyPath: childKey]) { child in
             HierarchicalReorderableRow(child, \.children, $draggingItem, moveAction: moveAction,
                                        content: { treeNode in
-                Text(treeNode.value as? String ?? "NoText")
+                content(treeNode)
             })
         }
         // FIXME: onInsert does not work well for ForEach which is embedded in another ForEach....
