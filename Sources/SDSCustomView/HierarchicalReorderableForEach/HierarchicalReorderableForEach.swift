@@ -18,6 +18,7 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
     var moveAction: (IndexPath, IndexPath) -> Void
     let content: (TreeNode<T>) -> Content
 
+
     public init( current: TreeNode<T>,
                  childKey: ReferenceWritableKeyPath<TreeNode<T>,[TreeNode<T>]>,
                  draggingItem: Binding<TreeNode<T>?>,
@@ -54,7 +55,11 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     var moveAction: (IndexPath, IndexPath) -> Void
     let content: (TreeNode<T>) -> Content
 
-    @State private var expand = false
+    @State private var expand = false {
+        didSet {
+            UserDefaults.standard.setValue(expand, forKey: node.id.uuidString)
+        }
+    }
     
     public init(_ node: TreeNode<T>,
                 _ childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>,
@@ -66,7 +71,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
         self._draggingItem = draggingItem
         self.moveAction = moveAction
         self.content = content
-        
+        self.expand = (UserDefaults.standard.value(forKey: node.id.uuidString) as? Bool) ?? false
     }
     
     var body: some View {
