@@ -19,7 +19,9 @@ every view is already used for app but basically all views are under develop for
 
   wrapped NSOutlineView in NSScrollView   
   
-- OutlineView with Drag&Drop support(pure SwiftUI)  
+- HierarchicalReorderableForEach (OutlineView with Drag&Drop support, pure SwiftUI)
+
+  experimental imple.
 
 ## TableView
 currently only for macOS
@@ -69,3 +71,52 @@ in case user modify their text size setting, label width would be affected.
 
 Sometimes we want to have fixed-width label"s" those have same width.
 Usually we don't mind width value itself, but want to align leading/center/traiing in same width.
+
+
+## HierarchicalReorderableForEach
+```
+func stringExample() -> TreeNode<String> {
+    let rootNode = TreeNode(value: "Root", children: [
+        TreeNode(value: "Child1", children: []),
+        TreeNode(value: "Child2", children: [
+            TreeNode(value: "GrandChild21", children: []),
+            TreeNode(value: "GrandChild22", children: []),
+            TreeNode(value: "GrandChild23", children: []),
+        ]),
+        TreeNode(value: "Child3", children: []),
+        TreeNode(value: "Child4", children: []),
+        TreeNode(value: "Child5", children: []),
+    ])
+    return rootNode
+}
+
+
+struct ContentView: View {
+    @StateObject private var rootNode = stringExample()
+    @State private var draggingItem: TreeNode<String>? = nil
+
+    var body: some View {
+        VStack {
+            HStack {
+                Text("Item in tree : \(rootNode.count)")
+                Button(action: {
+                    print(rootNode)
+                }, label: {Text("Print")})
+                Button(action: {
+                    rootNode.objectWillChange.send()
+                }, label: {Text("Refresh")})
+            }
+            List {
+                HierarchicalReorderableForEach(current: rootNode,
+                                               childKey: \.children,
+                                               draggingItem: $draggingItem,
+                                               moveAction: {(from,to) in
+                    rootNode.move(from: from, to: to)
+                }, content: { treeNode in
+                    Text(treeNode.value)
+                })
+            }
+        }
+    }
+}
+```
