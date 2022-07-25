@@ -84,29 +84,26 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            if moveAction == nil {
-                HStack {
+            HStack {
+                if !node.children.isEmpty {
                     Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
                         .onTapGesture {
                             expand.toggle()
                         }
+                } else {
+                    Image(systemName: "minus")
+                }
+                if moveAction == nil {
                     content(node).frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .onTapGesture {
-                    if selection.contains(node.id) {
-                        selection.remove(node.id)
-                    } else {
-                        selection.insert(node.id)
-                    }
-                }
-                .background(selection.contains(node.id) ? Color.blue.opacity(0.2) : Color.clear)
-                .padding(.bottom, 8)
-            } else {
-                HStack {
-                    Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
-                        .onTapGesture {
-                            expand.toggle()
+                    .onTapGesture {
+                        if selection.contains(node.id) {
+                            selection.remove(node.id)
+                        } else {
+                            selection.insert(node.id)
                         }
+                    }
+                    .background(selection.contains(node.id) ? Color.blue.opacity(0.2) : Color.clear)
+                } else {
                     content(node).frame(maxWidth: .infinity, alignment: .leading)
                         .onTapGesture {
                             if selection.contains(node.id) {
@@ -125,8 +122,8 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                                                                         draggingItem: $draggingItem,
                                                                         moveAction: moveAction))
                 }
-                .padding(.bottom, 8)
             }
+            .padding(.bottom, 8)
             if expand,
                !node.children.isEmpty {
                 HierarchicalReorderableForEach(current: node, selection: $selection,
