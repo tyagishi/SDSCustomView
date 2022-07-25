@@ -14,7 +14,7 @@ let dragType = [UTType.text]
 
 public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View {
     @ObservedObject var current: TreeNode<T>
-    @Binding var selection: Set<TreeNode<T>.ID>
+    @ObservedObject var selection: LimitedArray<TreeNode<T>>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
     var moveAction: ((IndexPath, IndexPath) -> Void)?
@@ -22,13 +22,14 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
 
 
     public init( current: TreeNode<T>,
-                 selection: Binding<Set<TreeNode<T>.ID>>,
+                 //selection: Binding<Set<TreeNode<T>.ID>>,
+                 selection: LimitedArray<TreeNode<T>>,
                  childKey: ReferenceWritableKeyPath<TreeNode<T>,[TreeNode<T>]>,
                  draggingItem: Binding<TreeNode<T>?>,
                  moveAction: ((IndexPath, IndexPath) -> Void)?,
                  @ViewBuilder content: @escaping (TreeNode<T>) -> Content ) {
         self.current = current
-        self._selection = selection
+        self.selection = selection
         self.childKey = childKey
         self._draggingItem = draggingItem
         self.moveAction = moveAction
@@ -36,7 +37,7 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
     }
     public var body: some View {
         ForEach(current[keyPath: childKey]) { child in
-            HierarchicalReorderableRow(child, $selection,
+            HierarchicalReorderableRow(child, selection,
                                        \.children, $draggingItem, moveAction: moveAction,
                                        content: { treeNode in
                 content(treeNode)
@@ -55,7 +56,8 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
 
 struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     @ObservedObject var node: TreeNode<T>
-    @Binding var selection: Set<TreeNode<T>.ID>
+    @ObservedObject var selection: LimitedArray<TreeNode<T>>
+    //@Binding var selection: Set<TreeNode<T>.ID>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
     var moveAction: ((IndexPath, IndexPath) -> Void)?
@@ -68,13 +70,14 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     }
     
     public init(_ node: TreeNode<T>,
-                _ selection: Binding<Set<TreeNode<T>.ID>>,
+                //_ selection: Binding<Set<TreeNode<T>.ID>>,
+                _ selection: LimitedArray<TreeNode<T>>,
                 _ childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>,
                 _ draggingItem: Binding<TreeNode<T>?>,
                 moveAction: ((IndexPath, IndexPath) -> Void)?,
                 @ViewBuilder content: @escaping (TreeNode<T>) -> Content ) {
         self.node = node
-        self._selection = selection
+        self.selection = selection
         self.childKey = childKey
         self._draggingItem = draggingItem
         self.moveAction = moveAction
@@ -96,23 +99,23 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                 if moveAction == nil {
                     content(node).frame(maxWidth: .infinity, alignment: .leading)
                     .onTapGesture {
-                        if selection.contains(node.id) {
-                            selection.remove(node.id)
+                        if selection.contains(node) {
+                            selection.remove(node)
                         } else {
-                            selection.insert(node.id)
+                            selection.insert(node)
                         }
                     }
-                    .background(selection.contains(node.id) ? Color.blue.opacity(0.2) : Color.clear)
+                    .background(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
                 } else {
                     content(node).frame(maxWidth: .infinity, alignment: .leading)
                         .onTapGesture {
-                            if selection.contains(node.id) {
-                                selection.remove(node.id)
+                            if selection.contains(node) {
+                                selection.remove(node)
                             } else {
-                                selection.insert(node.id)
+                                selection.insert(node)
                             }
                         }
-                        .background(selection.contains(node.id) ? Color.blue.opacity(0.2) : Color.clear)
+                        .background(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
                         .onDrag {
                             self.draggingItem = node
                             return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
@@ -126,7 +129,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
             .padding(.bottom, 8)
             if expand,
                !node.children.isEmpty {
-                HierarchicalReorderableForEach(current: node, selection: $selection,
+                HierarchicalReorderableForEach(current: node, selection: selection,
                                                childKey: \.children,
                                                draggingItem: $draggingItem, moveAction: {(_,_) in },
                                                content: content)
