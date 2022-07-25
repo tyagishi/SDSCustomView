@@ -91,7 +91,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                             expand.toggle()
                         }
                 } else {
-                    Image(systemName: "minus")
+                    Image(systemName: "minus").hidden()
                 }
                 if moveAction == nil {
                     content(node).frame(maxWidth: .infinity, alignment: .leading)
