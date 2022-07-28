@@ -105,7 +105,11 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                             selection.insert(node)
                         }
                     }
-                    .background(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
+                    .background {
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
+                            .padding(-2)
+                    }
                 } else {
                     content(node).frame(maxWidth: .infinity, alignment: .leading)
                         .onTapGesture {
@@ -115,7 +119,11 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                                 selection.insert(node)
                             }
                         }
-                        .background(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
+                        .background {
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
+                                .padding(-2)
+                        }
                         .onDrag {
                             self.draggingItem = node
                             return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
