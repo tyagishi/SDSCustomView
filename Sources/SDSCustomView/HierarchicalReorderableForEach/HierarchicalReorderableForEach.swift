@@ -14,7 +14,7 @@ let dragType = [UTType.text]
 
 public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View {
     @ObservedObject var current: TreeNode<T>
-    @ObservedObject var selection: LimitedArray<TreeNode<T>>
+    @ObservedObject var selection: LimitedOrderedSet<TreeNode<T>>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
     var moveAction: ((IndexPath, IndexPath) -> Void)?
@@ -23,7 +23,7 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
 
     public init( current: TreeNode<T>,
                  //selection: Binding<Set<TreeNode<T>.ID>>,
-                 selection: LimitedArray<TreeNode<T>>,
+                 selection: LimitedOrderedSet<TreeNode<T>>,
                  childKey: ReferenceWritableKeyPath<TreeNode<T>,[TreeNode<T>]>,
                  draggingItem: Binding<TreeNode<T>?>,
                  moveAction: ((IndexPath, IndexPath) -> Void)?,
@@ -56,7 +56,7 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
 
 struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     @ObservedObject var node: TreeNode<T>
-    @ObservedObject var selection: LimitedArray<TreeNode<T>>
+    @ObservedObject var selection: LimitedOrderedSet<TreeNode<T>>
     //@Binding var selection: Set<TreeNode<T>.ID>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
@@ -71,7 +71,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     
     public init(_ node: TreeNode<T>,
                 //_ selection: Binding<Set<TreeNode<T>.ID>>,
-                _ selection: LimitedArray<TreeNode<T>>,
+                _ selection: LimitedOrderedSet<TreeNode<T>>,
                 _ childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>,
                 _ draggingItem: Binding<TreeNode<T>?>,
                 moveAction: ((IndexPath, IndexPath) -> Void)?,
