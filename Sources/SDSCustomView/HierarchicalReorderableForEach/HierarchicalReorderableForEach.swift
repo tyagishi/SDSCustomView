@@ -91,7 +91,9 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                     if !node[keyPath: childKey].isEmpty {
                         Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
                             .onTapGesture {
-                                expand.toggle()
+                                withAnimation {
+                                    expand.toggle()
+                                }
                             }
                     } else {
                         Image(systemName: "minus").hidden()
