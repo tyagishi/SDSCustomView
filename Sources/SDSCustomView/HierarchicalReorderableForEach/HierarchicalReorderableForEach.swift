@@ -13,7 +13,7 @@ import Carbon.HIToolbox
 let dragType = [UTType.text]
 
 public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View {
-    @ObservedObject var current: TreeNode<T>
+    var items: [TreeNode<T>]
     @ObservedObject var selection: LimitedOrderedSet<TreeNode<T>>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
@@ -21,14 +21,14 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
     let content: (TreeNode<T>) -> Content
 
 
-    public init( current: TreeNode<T>,
+    public init( items: [TreeNode<T>],
                  //selection: Binding<Set<TreeNode<T>.ID>>,
                  selection: LimitedOrderedSet<TreeNode<T>>,
                  childKey: ReferenceWritableKeyPath<TreeNode<T>,[TreeNode<T>]>,
                  draggingItem: Binding<TreeNode<T>?>,
                  moveAction: ((IndexPath, IndexPath) -> Void)?,
                  @ViewBuilder content: @escaping (TreeNode<T>) -> Content ) {
-        self.current = current
+        self.items = items
         self.selection = selection
         self.childKey = childKey
         self._draggingItem = draggingItem
@@ -36,12 +36,15 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
         self.content = content
     }
     public var body: some View {
-        ForEach(current[keyPath: childKey]) { child in
-            HierarchicalReorderableRow(child, selection,
-                                       \.children, $draggingItem, moveAction: moveAction,
-                                       content: { treeNode in
-                content(treeNode)
-            })
+        ForEach(items) { item in
+            ForEach(item[keyPath: childKey]) { child in
+                HierarchicalReorderableRow(child, selection,
+                                           \.children, $draggingItem, moveAction: moveAction,
+                                           content: { treeNode in
+                    content(treeNode)
+                        .contentShape(Rectangle())
+                })
+            }
         }
         // FIXME: onInsert does not work well for ForEach which is embedded in another ForEach....
 //        .onInsert(of: dragType) { index, providers in
@@ -137,7 +140,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
             .padding(.bottom, 8)
             if expand,
                !node.children.isEmpty {
-                HierarchicalReorderableForEach(current: node, selection: selection,
+                HierarchicalReorderableForEach(items: [node], selection: selection,
                                                childKey: \.children,
                                                draggingItem: $draggingItem, moveAction: {(_,_) in },
                                                content: content)
