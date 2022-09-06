@@ -114,6 +114,8 @@ struct ContentView: View {
                     rootNode.move(from: from, to: to)
                 }, content: { treeNode in
                     Text(treeNode.value)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
                 })
             }
         }

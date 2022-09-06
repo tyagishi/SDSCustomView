@@ -41,7 +41,6 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
                                        childKey, $draggingItem, moveAction: moveAction,
                                        content: { treeNode in
                 content(treeNode)
-                    .contentShape(Rectangle())
             })
         }
         // FIXME: onInsert does not work well for ForEach which is embedded in another ForEach....
@@ -101,7 +100,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                 }
                 .frame(width: 20)
                 if moveAction == nil {
-                    content(node).frame(maxWidth: .infinity, alignment: .leading)
+                    content(node)
                     .onTapGesture {
                         if selection.contains(node) {
                             selection.remove(node)
@@ -115,7 +114,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                             .padding(-2)
                     }
                 } else {
-                    content(node).frame(maxWidth: .infinity, alignment: .leading)
+                    content(node)
                         .onTapGesture {
                             if selection.contains(node) {
                                 selection.remove(node)
