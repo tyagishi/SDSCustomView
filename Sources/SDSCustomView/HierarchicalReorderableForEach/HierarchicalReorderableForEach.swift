@@ -8,7 +8,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 import SDSDataStructure
-import Carbon.HIToolbox
+//import Carbon.HIToolbox
 
 let dragType = [UTType.text]
 
@@ -57,7 +57,6 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
 struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     @ObservedObject var node: TreeNode<T>
     @ObservedObject var selection: LimitedOrderedSet<TreeNode<T>>
-    //@Binding var selection: Set<TreeNode<T>.ID>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
     @Binding var draggingItem: TreeNode<T>?
     var moveAction: ((IndexPath, IndexPath) -> Void)?
@@ -86,7 +85,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack() {
             HStack {
                 Group {
                     if !node[keyPath: childKey].isEmpty {
@@ -108,11 +107,6 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                             selection.insert(node)
                         }
                     }
-                    .background {
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
-                            .padding(-2)
-                    }
                 } else {
                     content(node)
                         .onTapGesture {
@@ -121,11 +115,6 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                             } else {
                                 selection.insert(node)
                             }
-                        }
-                        .background {
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
-                                .padding(-2)
                         }
                         .onDrag {
                             self.draggingItem = node
@@ -138,6 +127,12 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
                 }
             }
             .padding(.bottom, 8)
+            .background {
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
+                    .padding(-2)
+            }
+
             if expand,
                !node[keyPath: childKey].isEmpty {
                 HierarchicalReorderableForEach(items: node[keyPath: childKey], selection: selection,
