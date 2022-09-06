@@ -37,14 +37,12 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
     }
     public var body: some View {
         ForEach(items) { item in
-            ForEach(item[keyPath: childKey]) { child in
-                HierarchicalReorderableRow(child, selection,
-                                           \.children, $draggingItem, moveAction: moveAction,
-                                           content: { treeNode in
-                    content(treeNode)
-                        .contentShape(Rectangle())
-                })
-            }
+            HierarchicalReorderableRow(item, selection,
+                                       childKey, $draggingItem, moveAction: moveAction,
+                                       content: { treeNode in
+                content(treeNode)
+                    .contentShape(Rectangle())
+            })
         }
         // FIXME: onInsert does not work well for ForEach which is embedded in another ForEach....
 //        .onInsert(of: dragType) { index, providers in
@@ -91,14 +89,17 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                if !node.children.isEmpty {
-                    Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
-                        .onTapGesture {
-                            expand.toggle()
-                        }
-                } else {
-                    Image(systemName: "minus").hidden()
+                Group {
+                    if !node[keyPath: childKey].isEmpty {
+                        Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
+                            .onTapGesture {
+                                expand.toggle()
+                            }
+                    } else {
+                        Image(systemName: "minus").hidden()
+                    }
                 }
+                .frame(width: 20)
                 if moveAction == nil {
                     content(node).frame(maxWidth: .infinity, alignment: .leading)
                     .onTapGesture {
@@ -139,14 +140,14 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
             }
             .padding(.bottom, 8)
             if expand,
-               !node.children.isEmpty {
-                HierarchicalReorderableForEach(items: [node], selection: selection,
-                                               childKey: \.children,
-                                               draggingItem: $draggingItem, moveAction: {(_,_) in },
+               !node[keyPath: childKey].isEmpty {
+                HierarchicalReorderableForEach(items: node[keyPath: childKey], selection: selection,
+                                               childKey: childKey,
+                                               draggingItem: $draggingItem, moveAction: moveAction,
                                                content: content)
             }
         }
-        .padding(.leading, CGFloat((node.indexPath().count - 1) * 8))
+        .padding(.leading, CGFloat((node.indexPath().count) * 8))
     }
     
     @ViewBuilder
