@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 import SDSDataStructure
 //import Carbon.HIToolbox
 
-let dragType = [UTType.text]
+let dragTypes = [UTType.text]
 
 public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View {
     var items: [TreeNode<T>]
@@ -44,12 +44,16 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
             })
         }
         // FIXME: onInsert does not work well for ForEach which is embedded in another ForEach....
-//        .onInsert(of: dragType) { index, providers in
+        .onInsert(of: dragTypes) { index, providers in
 //            guard let draggingItem = draggingItem else { return }
 //            let currentIndex = current.indexPath()
 //            let fromIndex = draggingItem.indexPath()
 //            print("onInsert node: \(fromIndex) to: \(index) under: \(currentIndex)")
+            print("onInsert index: \(index)")
 //            moveAction(fromIndex, fromIndex)
+        }
+//        .onMove { indexSet, to in
+//            print("onMove \(indexSet), \(to)")
 //        }
     }
 }
@@ -61,6 +65,9 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     @Binding var draggingItem: TreeNode<T>?
     var moveAction: ((IndexPath, IndexPath) -> Void)?
     let content: (TreeNode<T>) -> Content
+    @State private var expandFlag = false
+    
+    @State private var isTargeted: Bool = false
 
     @State private var expand = false {
         didSet {
@@ -85,65 +92,88 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     }
     
     var body: some View {
-        VStack() {
-            HStack {
-                Group {
-                    if !node[keyPath: childKey].isEmpty {
-                        Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
-                            .onTapGesture {
-                                withAnimation {
-                                    expand.toggle()
-                                }
-                            }
-                    } else {
-                        Image(systemName: "minus").hidden()
-                    }
-                }
-                .frame(width: 20)
-                if moveAction == nil {
-                    content(node)
-                    .onTapGesture {
-                        if selection.contains(node) {
-                            selection.remove(node)
-                        } else {
-                            selection.insert(node)
-                        }
-                    }
-                } else {
-                    content(node)
-                        .onTapGesture {
-                            if selection.contains(node) {
-                                selection.remove(node)
-                            } else {
-                                selection.insert(node)
-                            }
-                        }
-                        .onDrag {
-                            self.draggingItem = node
-                            return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
-                        }
-                        .onDrop(of: dragType, delegate: DragDelegate<T>(root: node.rootNode(),
-                                                                        item: node,
-                                                                        draggingItem: $draggingItem,
-                                                                        moveAction: moveAction))
-                }
-            }
-            .padding(.bottom, 8)
-            .background {
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
-                    .padding(-2)
-            }
+        DisclosureGroup(isExpanded: $expandFlag, content: {
+            HierarchicalReorderableForEach(items: node[keyPath: childKey], selection: selection,
+                                           childKey: childKey,
+                                           draggingItem: $draggingItem, moveAction: moveAction,
+                                           content: content)
 
-            if expand,
-               !node[keyPath: childKey].isEmpty {
-                HierarchicalReorderableForEach(items: node[keyPath: childKey], selection: selection,
-                                               childKey: childKey,
-                                               draggingItem: $draggingItem, moveAction: moveAction,
-                                               content: content)
-            }
-        }
-        .padding(.leading, CGFloat((node.indexPath().count) * 8))
+        }, label: {
+            content(node)
+                .onDrag {
+                    self.draggingItem = node
+                    print("onDrag id: \(node.id)")
+                    return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
+                }
+//                .onDrop(of: dragTypes, isTargeted: $isTargeted, perform: { providers in
+//                    print("isTargeted: \(isTargeted)")
+//                    return true
+//                })
+//                .onDrop(of: dragType, delegate: DragDelegate<T>(root: node.rootNode(),
+//                                                                item: node,
+//                                                                draggingItem: $draggingItem,
+//                                                                moveAction: moveAction))
+        })
+
+//        VStack() {
+//            HStack {
+//                Group {
+//                    if !node[keyPath: childKey].isEmpty {
+//                        Image(systemName: "chevron.right").rotationEffect(expand ? .degrees(90) : .degrees(0))
+//                            .onTapGesture {
+//                                withAnimation {
+//                                    expand.toggle()
+//                                }
+//                            }
+//                    } else {
+//                        Image(systemName: "minus").hidden()
+//                    }
+//                }
+//                .frame(width: 20)
+//                if moveAction == nil {
+//                    content(node)
+//                    .onTapGesture {
+//                        if selection.contains(node) {
+//                            selection.remove(node)
+//                        } else {
+//                            selection.insert(node)
+//                        }
+//                    }
+//                } else {
+//                    content(node)
+//                        .onTapGesture {
+//                            if selection.contains(node) {
+//                                selection.remove(node)
+//                            } else {
+//                                selection.insert(node)
+//                            }
+//                        }
+//                        .onDrag {
+//                            self.draggingItem = node
+//                            return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
+//                        }
+//                        .onDrop(of: dragType, delegate: DragDelegate<T>(root: node.rootNode(),
+//                                                                        item: node,
+//                                                                        draggingItem: $draggingItem,
+//                                                                        moveAction: moveAction))
+//                }
+//            }
+//            .padding(.bottom, 8)
+//            .background {
+//                RoundedRectangle(cornerRadius: 3)
+//                    .fill(selection.contains(node) ? Color.blue.opacity(0.2) : Color.clear)
+//                    .padding(-2)
+//            }
+//
+//            if expand,
+//               !node[keyPath: childKey].isEmpty {
+//                HierarchicalReorderableForEach(items: node[keyPath: childKey], selection: selection,
+//                                               childKey: childKey,
+//                                               draggingItem: $draggingItem, moveAction: moveAction,
+//                                               content: content)
+//            }
+//        }
+//        .padding(.leading, CGFloat((node.indexPath().count) * 8))
     }
     
     @ViewBuilder
@@ -171,7 +201,7 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
             self.draggingItem = node
             return NSItemProvider(object: ((node.value as? String) ?? "NoText") as NSString)
         }
-        .onDrop(of: dragType, delegate: DragDelegate<T>(root: node.rootNode(),
+        .onDrop(of: dragTypes, delegate: DragDelegate<T>(root: node.rootNode(),
                                                         item: node,
                                                         draggingItem: $draggingItem,
                                                         moveAction: moveAction))
