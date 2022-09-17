@@ -29,7 +29,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     
 
     public init(_ dataSet: [DataPoint],
-                color: Color = Color.red, vertexSymbol: (() -> AnyView)? = nil,
+                linecolor: Color = Color.red, vertexSymbol: (() -> AnyView)? = nil,
                 xValueRange: ClosedRange<Double>? = nil, yValueRange: ClosedRange<Double>? = nil,
                 size: CGSize, canvas: SDSCanvas? = nil,
                 labelOffset: CGVector = .zero,
@@ -37,7 +37,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
                 tooltipFormatter: @escaping((CGPoint)->String) = {_ in ""} ) {
         precondition(size != .zero || canvas != nil)
         self.dataPoints = dataSet
-        self.lineColor = color
+        self.lineColor = linecolor
         self.vertexSymbol = vertexSymbol?() ?? EmptyView().anyView()
         let calcedXValueRange = xValueRange ?? ClosedRange(uncheckedBounds: (dataSet.map({$0.loc.x}).min() ?? 0.0, dataSet.map({$0.loc.x}).max() ?? 100.0))
         let calcedYValueRange = yValueRange ?? ClosedRange(uncheckedBounds: (dataSet.map({$0.loc.y}).min() ?? 0.0, dataSet.map({$0.loc.y}).max() ?? 100.0))
