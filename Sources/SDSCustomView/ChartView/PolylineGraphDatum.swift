@@ -12,8 +12,8 @@ import SDSCGExtension
 public class PolylineGraphDatum: ObservableObject, Identifiable {
     public let id = UUID()
     @Published var dataPoints:[DataPoint]
-    @Published var xValueRange: ClosedRange<Double>
-    @Published var yValueRange: ClosedRange<Double>
+    @Published public var xValueRange: ClosedRange<Double>
+    @Published public var yValueRange: ClosedRange<Double>
     let vertexSymbol: AnyView
     @Published var lineColor: Color
     @Published public var canvas: SDSCanvas
@@ -22,18 +22,23 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     let valueLabelFormatter: ((CGPoint)->String)
     
     let tooltipFormatter: (CGPoint) -> String
+    
+    // yAxis
+    let yAxisInfo: AxisInfo?
+    
+    
 
     public init(_ dataSet: [DataPoint],
-                color: Color = Color.red, vertexSymbol: () -> AnyView,
+                color: Color = Color.red, vertexSymbol: (() -> AnyView)? = nil,
                 xValueRange: ClosedRange<Double>? = nil, yValueRange: ClosedRange<Double>? = nil,
-                size: CGSize = CGSize.zero, canvas: SDSCanvas? = nil,
+                size: CGSize, canvas: SDSCanvas? = nil,
                 labelOffset: CGVector = .zero,
                 valueLabelFormatter: @escaping ((CGPoint) -> String) = {_ in ""},
                 tooltipFormatter: @escaping((CGPoint)->String) = {_ in ""} ) {
         precondition(size != .zero || canvas != nil)
         self.dataPoints = dataSet
         self.lineColor = color
-        self.vertexSymbol = vertexSymbol()
+        self.vertexSymbol = vertexSymbol?() ?? EmptyView().anyView()
         let calcedXValueRange = xValueRange ?? ClosedRange(uncheckedBounds: (dataSet.map({$0.loc.x}).min() ?? 0.0, dataSet.map({$0.loc.x}).max() ?? 100.0))
         let calcedYValueRange = yValueRange ?? ClosedRange(uncheckedBounds: (dataSet.map({$0.loc.y}).min() ?? 0.0, dataSet.map({$0.loc.y}).max() ?? 100.0))
         self.xValueRange = calcedXValueRange
@@ -48,12 +53,12 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
             self.canvas = canvas
         } else {
             var adjustedXRange = calcedXValueRange.expand(toLower: calcedXValueRange.width * 0.1 , toUpper: calcedXValueRange.width * 0.1)
-            if adjustedXRange.width <= 10 {
-                adjustedXRange = adjustedXRange.expand(toLower: 50, toUpper: 50)
-            }
+//            if adjustedXRange.width <= 10 {
+//                adjustedXRange = adjustedXRange.expand(toLower: 10, toUpper: 10)
+//            }
             var adjustedYRange = calcedYValueRange.expand(toLower: calcedYValueRange.height * 0.1, toUpper: calcedYValueRange.height * 0.1)
             if adjustedYRange.height <= 10 {
-                adjustedYRange = adjustedYRange.expand(toLower: 50, toUpper: 50)
+                adjustedYRange = adjustedYRange.expand(toLower: 10, toUpper: 10)
             }
             let xyScale = CGVector(dx: size.width / adjustedXRange.width,
                                    dy: size.height / adjustedYRange.height)
@@ -61,6 +66,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
                                   y: adjustedYRange.lowerBound)
             self.canvas = SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
         }
+        self.yAxisInfo = nil
     }
     
     var dataSetForGraph: [DataPoint] {
