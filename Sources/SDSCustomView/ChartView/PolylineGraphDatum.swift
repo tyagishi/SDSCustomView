@@ -24,7 +24,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     let tooltipFormatter: (CGPoint) -> String
     
     // yAxis
-    let yAxisInfo: AxisInfo?
+    public var yAxisInfo: AxisInfo?
     
     
 

@@ -97,7 +97,8 @@ public struct Charts<tContent: View, legendView: View, xAxisLabel: View, yAxisLa
 //                }
 //            }
             ForEach(graphData.graphDatum) { datum in
-                PolylineView(datum, canvas: datum.canvas, yAxis: yAxis, yAxisContent: yAxisContent,
+                PolylineView(datum, canvas: datum.canvas,// yAxis: yAxis,
+                             yAxisContent: yAxisContent,
                              xGrid: xGrid, yGrid: yGrid)
             }
         }
@@ -186,19 +187,19 @@ public struct YAxisView<lContent: View>: View {
 struct PolylineView<yAxisLabel: View>: View {
     @ObservedObject var datum:PolylineGraphDatum
     let canvas: SDSCanvas
-    let yAxis: AxisInfo?
+//    let yAxis: AxisInfo?
     let yAxisContent: ((CGFloat) -> yAxisLabel)
 
     let xGrid: GridConfig
     let yGrid: GridConfig
 
     init(_ datum: PolylineGraphDatum, canvas: SDSCanvas,
-         yAxis: AxisInfo? = nil,
+//         yAxis: AxisInfo? = nil,
          yAxisContent: @escaping ((CGFloat) -> yAxisLabel),
          xGrid: GridConfig, yGrid: GridConfig) {
         self.datum = datum
         self.canvas = canvas
-        self.yAxis = yAxis
+//        self.yAxis = yAxis
         self.yAxisContent = yAxisContent
         self.xGrid = xGrid
         self.yGrid = yGrid
@@ -235,8 +236,7 @@ struct PolylineView<yAxisLabel: View>: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
 
-            
-            if let info = yAxis {
+            if let info = datum.yAxisInfo {
                 YAxisView(canvas: canvas , axisValue: info.axisValue, axisEnds: (info.axisEnds.from, info.axisEnds.to), color: info.color,
                           labelValues: info.labelValues, labelContent: { value in
                     yAxisContent(value)
