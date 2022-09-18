@@ -40,7 +40,6 @@ public struct Charts<tContent: View, legendView: View, xAxisLabel: View, yAxisLa
 
     let xAxis: AxisInfo?
     let xAxisContent: ((CGFloat) -> xAxisLabel)
-    let yAxis: AxisInfo?
     let yAxisContent: ((CGFloat) -> yAxisLabel)
 
     public init(_ graphData: GraphData,
@@ -48,14 +47,12 @@ public struct Charts<tContent: View, legendView: View, xAxisLabel: View, yAxisLa
                 @ViewBuilder legend: @escaping (() -> legendView) = { EmptyView() },
                 xAxis: AxisInfo? = nil,
                 xAxisContent: @escaping ((CGFloat) -> xAxisLabel) = {_ in EmptyView()},
-                yAxis: AxisInfo? = nil,
                 yAxisContent: @escaping ((CGFloat) -> yAxisLabel) = {_ in EmptyView()}) {
         self.graphData = graphData
         self.title = title()
         self.legend = legend()
         self.xAxis = xAxis
         self.xAxisContent = xAxisContent
-        self.yAxis = yAxis
         self.yAxisContent = yAxisContent
 
         self.size = graphData.graphDatum.first?.canvas.canvasSize ?? CGSize(width: 100, height: 100)
@@ -193,16 +190,16 @@ struct PolylineView<yAxisLabel: View>: View {
                 .fill(datum.lineColor)
                 .clipped()
 
-//                    ForEach(datum.dataPoints) { data in
-//                        datum.vertexSymbol
-//                            .position(canvas.locOnCanvas(data.loc))
-//                            .foregroundColor(datum.lineColor)
-//                        Text(datum.valueLabelFormatter(data.loc))
-//                            .help(datum.tooltipFormatter(data.loc))
-//                            .position(canvas.locOnCanvas(data.loc).move(datum.labelOffset))
-//                            .foregroundColor(datum.lineColor)
-//                            .font(.footnote)
-//                    }
+                ForEach(datum.dataPoints) { data in
+                    datum.vertexSymbol(data)
+                        .position(canvas.locOnCanvas(data.loc))
+                    //                            .foregroundColor(datum.lineColor)
+                    //                        Text(datum.valueLabelFormatter(data.loc))
+                    //                            .help(datum.tooltipFormatter(data.loc))
+                    //                            .position(canvas.locOnCanvas(data.loc).move(datum.labelOffset))
+                    //                            .foregroundColor(datum.lineColor)
+                    //                            .font(.footnote)
+                }
             } else {
                 Text("No data for graph")
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
