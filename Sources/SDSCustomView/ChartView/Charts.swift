@@ -189,7 +189,7 @@ struct PolylineView<yAxisLabel: View>: View {
                         path.addLine(to: canvas.locOnCanvas(datum.dataSetForGraph[index].loc))
                     }
                 }
-                .stroke(lineWidth: 3.0)
+                .stroke(style: StrokeStyle(lineWidth: 3.0, lineCap: .round, lineJoin: .round))
                 .fill(datum.lineColor)
                 .clipped()
 
