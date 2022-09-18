@@ -31,7 +31,7 @@ public struct AxisInfo {
     }
 }
 
-public struct Charts<tContent: View, legendView: View, xAxisLabel: View, yAxisLabel: View>: View {
+public struct Charts<tContent: View, legendView: View>: View {
     @ObservedObject var graphData: GraphData
     let size: CGSize
 
@@ -39,15 +39,15 @@ public struct Charts<tContent: View, legendView: View, xAxisLabel: View, yAxisLa
     let legend: legendView
 
     let xAxis: AxisInfo?
-    let xAxisContent: ((CGFloat) -> xAxisLabel)
-    let yAxisContent: ((CGFloat) -> yAxisLabel)
+    let xAxisContent: XAxisView.LabelGen
+    let yAxisContent: YAxisView.LabelGen
 
     public init(_ graphData: GraphData,
                 @ViewBuilder title: @escaping (() -> tContent) = { EmptyView() },
                 @ViewBuilder legend: @escaping (() -> legendView) = { EmptyView() },
                 xAxis: AxisInfo? = nil,
-                xAxisContent: @escaping ((CGFloat) -> xAxisLabel) = {_ in EmptyView()},
-                yAxisContent: @escaping ((CGFloat) -> yAxisLabel) = {_ in EmptyView()}) {
+                xAxisContent: @escaping XAxisView.LabelGen = {_ in EmptyView().anyView() },
+                yAxisContent: @escaping YAxisView.LabelGen = {_ in EmptyView().anyView() }) {
         self.graphData = graphData
         self.title = title()
         self.legend = legend()
@@ -77,8 +77,8 @@ public struct Charts<tContent: View, legendView: View, xAxisLabel: View, yAxisLa
 }
 
 
-public struct XAxisView<lContent: View>: View {
-    public typealias LabelGen = ((CGFloat) -> lContent)
+public struct XAxisView: View {
+    public typealias LabelGen = ((CGFloat) -> AnyView)
     let canvas: SDSCanvas
     let axisInfo: AxisInfo
     let labelContent: LabelGen
@@ -119,8 +119,8 @@ public struct XAxisView<lContent: View>: View {
         }
     }
 }
-public struct YAxisView<lContent: View>: View {
-    public typealias LabelGen = ((CGFloat) -> lContent)
+public struct YAxisView: View {
+    public typealias LabelGen = ((CGFloat) -> AnyView)
     let canvas: SDSCanvas
     let axisInfo: AxisInfo
     let labelContent: LabelGen
@@ -162,13 +162,13 @@ public struct YAxisView<lContent: View>: View {
     }
 }
 
-struct PolylineView<yAxisLabel: View>: View {
+struct PolylineView: View {
     @ObservedObject var datum:PolylineGraphDatum
     let canvas: SDSCanvas
-    let yAxisContent: ((CGFloat) -> yAxisLabel)
+    let yAxisContent: YAxisView.LabelGen
 
     init(_ datum: PolylineGraphDatum, canvas: SDSCanvas,
-         yAxisContent: @escaping ((CGFloat) -> yAxisLabel)) {
+         yAxisContent: @escaping YAxisView.LabelGen) {
         self.datum = datum
         self.canvas = canvas
         self.yAxisContent = yAxisContent
@@ -193,7 +193,7 @@ struct PolylineView<yAxisLabel: View>: View {
                 ForEach(datum.dataPoints) { data in
                     datum.vertexSymbol(data)
                         .position(canvas.locOnCanvas(data.loc))
-                    //                            .foregroundColor(datum.lineColor)
+                        .foregroundColor(datum.lineColor)
                     //                        Text(datum.valueLabelFormatter(data.loc))
                     //                            .help(datum.tooltipFormatter(data.loc))
                     //                            .position(canvas.locOnCanvas(data.loc).move(datum.labelOffset))
