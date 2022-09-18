@@ -13,21 +13,23 @@ import SwiftUIDebugUtil
 public typealias GraphLabel = ((CGFloat) -> any View)
 
 public struct AxisInfo {
+    public typealias AxisLabelGen = ((CGFloat) -> AnyView)
     let axisValue: CGFloat // for X-Axis, this is Y-Value,for Y-Axis other way around
     let gridValues: [CGFloat]
     let color: Color
     let gridColor: Color
     let labelValues: [CGFloat] // value in data coordinate (label will be appeared along axis)
-    
-    public init(axisValue: CGFloat,
-                color: Color,
+    let labelContent: AxisInfo.AxisLabelGen
+
+    public init(axisValue: CGFloat, color: Color,
                 gridValues: [CGFloat] = [], gridColor: Color = .clear,
-                labelValues: [CGFloat]) {
+                labelValues: [CGFloat], labelContent: @escaping AxisInfo.AxisLabelGen = { _ in EmptyView().anyView() } ) {
         self.axisValue = axisValue
         self.color = color
-        self.labelValues = labelValues
         self.gridValues = gridValues
         self.gridColor = gridColor
+        self.labelValues = labelValues
+        self.labelContent = labelContent
     }
 }
 
@@ -39,21 +41,15 @@ public struct Charts<tContent: View, legendView: View>: View {
     let legend: legendView
 
     let xAxis: AxisInfo?
-    let xAxisContent: XAxisView.LabelGen
-    let yAxisContent: YAxisView.LabelGen
 
     public init(_ graphData: GraphData,
                 @ViewBuilder title: @escaping (() -> tContent) = { EmptyView() },
                 @ViewBuilder legend: @escaping (() -> legendView) = { EmptyView() },
-                xAxis: AxisInfo? = nil,
-                xAxisContent: @escaping XAxisView.LabelGen = {_ in EmptyView().anyView() },
-                yAxisContent: @escaping YAxisView.LabelGen = {_ in EmptyView().anyView() }) {
+                xAxis: AxisInfo? = nil ) {
         self.graphData = graphData
         self.title = title()
         self.legend = legend()
         self.xAxis = xAxis
-        self.xAxisContent = xAxisContent
-        self.yAxisContent = yAxisContent
 
         self.size = graphData.graphDatum.first?.canvas.canvasSize ?? CGSize(width: 100, height: 100)
     }
@@ -65,11 +61,10 @@ public struct Charts<tContent: View, legendView: View>: View {
             if let datum = graphData.graphDatum.first,
                let info = xAxis {
                 XAxisView(canvas: datum.canvas, axisInfo: info,
-                          labelContent: xAxisContent)
+                          labelContent: info.labelContent)
             }
             ForEach(graphData.graphDatum) { datum in
-                PolylineView(datum, canvas: datum.canvas,// yAxis: yAxis,
-                             yAxisContent: yAxisContent)
+                PolylineView(datum, canvas: datum.canvas)
             }
         }
         .frame(size)
@@ -165,13 +160,10 @@ public struct YAxisView: View {
 struct PolylineView: View {
     @ObservedObject var datum:PolylineGraphDatum
     let canvas: SDSCanvas
-    let yAxisContent: YAxisView.LabelGen
 
-    init(_ datum: PolylineGraphDatum, canvas: SDSCanvas,
-         yAxisContent: @escaping YAxisView.LabelGen) {
+    init(_ datum: PolylineGraphDatum, canvas: SDSCanvas) {
         self.datum = datum
         self.canvas = canvas
-        self.yAxisContent = yAxisContent
     }
     
     var body: some View {
@@ -207,9 +199,7 @@ struct PolylineView: View {
 
             if let info = datum.yAxisInfo {
                 YAxisView(canvas: canvas , axisInfo: info,
-                          labelContent: { value in
-                    yAxisContent(value)
-                })
+                          labelContent: info.labelContent)
             }
         }
     }
