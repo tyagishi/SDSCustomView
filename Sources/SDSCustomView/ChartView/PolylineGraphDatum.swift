@@ -31,7 +31,8 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     public init(_ dataSet: [DataPoint],
                 linecolor: Color = Color.red, vertexSymbol: (() -> AnyView)? = nil,
                 xValueRange: ClosedRange<Double>? = nil, yValueRange: ClosedRange<Double>? = nil,
-                size: CGSize, canvas: SDSCanvas? = nil,
+                size: CGSize,
+                canvas: SDSCanvas? = nil,
                 labelOffset: CGVector = .zero,
                 valueLabelFormatter: @escaping ((CGPoint) -> String) = {_ in ""},
                 tooltipFormatter: @escaping((CGPoint)->String) = {_ in ""} ) {
@@ -119,4 +120,21 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         return SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
     }
     
+//    static public func canvasFor(_ size: CGSize, dataPoints: [DataPoint]) -> SDSCanvas {
+//        let xValueRange = dataPoints.xValueRange ?? 0...10
+//        let yValueRange = dataPoints.yValueRange ?? 0...10
+//        let llPoint = CGPoint(x: xValueRange.lowerBound, y: yValueRange.lowerBound)
+//        let xyScale = CGVector(dx: size.width / xValueRange.width, dy: size.height / yValueRange.width)
+//
+//        return SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
+//    }
+    static public func canvasFor(_ size: CGSize, dataPoints: [DataPoint], xValueRange: ClosedRange<Double>? = nil) -> SDSCanvas {
+        let xValueRange = xValueRange ?? (dataPoints.xValueRange ?? 0...10)
+        let yValueRange = dataPoints.yValueRange ?? 0...10
+        let llPoint = CGPoint(x: xValueRange.lowerBound, y: yValueRange.lowerBound)
+        let xyScale = CGVector(dx: size.width / xValueRange.width, dy: size.height / yValueRange.width)
+
+        return SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
+    }
+
 }
