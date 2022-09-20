@@ -42,7 +42,7 @@ public struct Charts<tContent: View, legendView: View>: View {
 
     let xAxis: AxisInfo?
 
-    public init(_ graphData: GraphData,
+    public init(_ graphData: GraphData, size: CGSize,
                 @ViewBuilder title: @escaping (() -> tContent) = { EmptyView() },
                 @ViewBuilder legend: @escaping (() -> legendView) = { EmptyView() },
                 xAxis: AxisInfo? = nil ) {
@@ -50,8 +50,7 @@ public struct Charts<tContent: View, legendView: View>: View {
         self.title = title()
         self.legend = legend()
         self.xAxis = xAxis
-
-        self.size = graphData.graphDatum.first?.canvas.canvasSize ?? CGSize(width: 100, height: 100)
+        self.size = size
     }
     
     public var body: some View {
@@ -153,9 +152,7 @@ public struct YAxisView: View {
                 let labelPoint = canvas.locOnCanvas(CGPoint(x: 0, y:labelValue))
                 labelContent(labelValue)
                     .position(x: axisPoint.x, y: labelPoint.y)
-                let _ = { print("pos \(axisPoint.x), \(labelPoint.y)")}()
             }
-
         }
             
     }
@@ -190,11 +187,6 @@ struct PolylineView: View {
                     datum.vertexSymbol(data)
                         .position(canvas.locOnCanvas(data.loc))
                         .foregroundColor(datum.lineColor)
-                    //                        Text(datum.valueLabelFormatter(data.loc))
-                    //                            .help(datum.tooltipFormatter(data.loc))
-                    //                            .position(canvas.locOnCanvas(data.loc).move(datum.labelOffset))
-                    //                            .foregroundColor(datum.lineColor)
-                    //                            .font(.footnote)
                 }
             } else {
                 Text("No data for graph")
