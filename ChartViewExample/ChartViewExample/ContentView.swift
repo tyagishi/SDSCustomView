@@ -33,20 +33,24 @@ struct ContentView: View {
         let xRange = (0.0)...(100.0)
         let graphData = DataPoint.randomSample(10, yRange: 10...100, xScale: 10, yScale: 1)
 
-        let canvas = PolylineGraphDatum.canvasFor(size, dataPoints: graphData,
-                                                  edgeInsetRatio: EdgeInsets(top: 0.1, leading: 0.1, bottom: 0.1, trailing: 0.1))
+        let canvas = PolylineGraphDatum.canvasFor(size, xValueRange: 0...100, yValueRange: 0...110,
+                                                  edgeInsetRatio: EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20))
+
+//        let canvas = PolylineGraphDatum.canvasFor(size, dataPoints: graphData,
+//                                                  edgeInsetRatio: EdgeInsets(top: 0.1, leading: 0.1, bottom: 0.1, trailing: 0.1))
 
         let polylineGraphDatum = PolylineGraphDatum(graphData, canvas: canvas)
 
-        let xAxisInfo = AxisInfo(axisValue: 20, color: .red, gridValues: [20, 40, 60, 80, 100], gridColor: .yellow.opacity(0.5), labelValues: [0,20,40,60,80,100],
+        let xAxisInfo = AxisInfo(axisValue: 0, color: .red, gridValues: [20, 40, 60, 80, 100], gridColor: .red.opacity(0.5), labelValues: [25, 50, 75, 100],
                                  labelContent: { labelValue in
             Text(String("\(labelValue)"))
-                .offset(x: 0, y: -100)
+                //.offset(x: -10, y: 0)
                 .anyView()
         })
-        let yAxisInfo = AxisInfo(axisValue: 0, color: .green, gridValues: [25, 50, 75, 100], gridColor: .green.opacity(0.3), labelValues: [0,20,40,60,80,100],
+        let yAxisInfo = AxisInfo(axisValue: 0, color: .green, gridValues: [25, 50, 75, 100], gridColor: .green.opacity(0.3), labelValues: [0, 20, 40, 60, 80, 100],
                                  labelContent: { labelValue in
             Text(String("\(labelValue)"))
+                //.offset(x: 0, y: -10)
                 .anyView()
         })
 

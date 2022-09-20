@@ -146,4 +146,30 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         return SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
     }
 
+    /// generate canvas for Chart from given data ranges
+    /// - Parameters:
+    ///   - size: chart actual size (in dot)
+    ///   - xValueRange: x value range
+    ///   - yValueRange: y value range
+    ///   - edgeInsetRatio: padding in dot
+    /// - Returns: canvas for chart
+    static public func canvasFor(_ size: CGSize, xValueRange: ClosedRange<Double>, yValueRange:ClosedRange<Double>,
+                                 edgeInsetRatio: EdgeInsets = EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)) -> SDSCanvas {
+        let chartSize = CGSize(width: size.width - edgeInsetRatio.leading - edgeInsetRatio.trailing,
+                               height: size.height - edgeInsetRatio.top - edgeInsetRatio.bottom)
+
+        let xScale = chartSize.width / xValueRange.width
+        let yScale = chartSize.height / yValueRange.width
+
+        let leadingInValue = edgeInsetRatio.leading / xScale
+        //let trainingInValue = edgeInsetRatio.trailing / xScale
+
+        //let topInValue = edgeInsetRatio.top / yScale
+        let bottomInValue = edgeInsetRatio.bottom / yScale
+
+        let llPoint = CGPoint(x: xValueRange.lowerBound - leadingInValue, y: yValueRange.lowerBound - bottomInValue)
+
+        return SDSCanvas(llValue: llPoint, xyScale: CGVector(dx: xScale, dy: yScale), canvasSize: size)
+    }
+
 }
