@@ -88,27 +88,29 @@ public struct XAxisView: View {
 
     public var body: some View {
         ZStack {
-            let axisStart = canvas.locOnCanvas(CGPoint(x: 0.0, y: axisInfo.axisValue))
+            let axisPoint = canvas.locOnCanvas(CGPoint(x: 0.0, y: axisInfo.axisValue))
+            // MARK: Axis
             Path { context in
-                context.move(to: CGPoint(x: 0, y: axisStart.y))
-                context.addLine(to: CGPoint(x: canvas.canvasSize.width, y: axisStart.y))
+                context.move(to: CGPoint(x: 0, y: axisPoint.y))
+                context.addLine(to: CGPoint(x: canvas.canvasSize.width, y: axisPoint.y))
             }
             .stroke(lineWidth: 1.0)
             .fill(axisInfo.color)
+            // grid vertical to axis
             ForEach(axisInfo.gridValues, id: \.self) { gridValue in
-                let gridPoint = canvas.locOnCanvas(CGPoint(x: 0.0, y: gridValue))
+                let gridPoint = canvas.locOnCanvas(CGPoint(x: gridValue, y: 0))
                 Path { context in
-                    context.move(to: CGPoint(x: 0, y: gridPoint.y))
-                    context.addLine(to: CGPoint(x: canvas.canvasWidth, y: gridPoint.y))
+                    context.move(to: CGPoint(x: gridPoint.x, y: 0))
+                    context.addLine(to: CGPoint(x: gridPoint.x, y: canvas.canvasHeight))
                 }
                 .stroke(lineWidth: 0.5)
                 .fill(axisInfo.gridColor)
             }
-
-            ForEach(axisInfo.labelValues, id: \.self) { value in
-                labelContent(value)
-                    .position(canvas.locOnCanvas(.init(x: value, y: axisInfo.axisValue)))
-                    .font(.footnote)
+            // label along axis
+            ForEach(axisInfo.labelValues, id: \.self) { labelValue in
+                let labelPoint = canvas.locOnCanvas(CGPoint(x: labelValue, y: 0))
+                labelContent(labelValue)
+                    .position(x: labelPoint.x, y: axisPoint.y)
             }
 
         }
@@ -131,27 +133,29 @@ public struct YAxisView: View {
 
     public var body: some View {
         ZStack {
-            let axisStart = canvas.locOnCanvas(CGPoint(x: axisInfo.axisValue, y: 0))
+            let axisPoint = canvas.locOnCanvas(CGPoint(x: axisInfo.axisValue, y: 0))
             Path { context in
-                context.move(to: CGPoint(x: axisStart.x, y: 0))
-                context.addLine(to: CGPoint(x: axisStart.x, y: canvas.canvasHeight))
+                context.move(to: CGPoint(x: axisPoint.x, y: 0))
+                context.addLine(to: CGPoint(x: axisPoint.x, y: canvas.canvasHeight))
             }
             .stroke(lineWidth: 1.0)
             .fill(axisInfo.color)
             ForEach(axisInfo.gridValues, id: \.self) { gridValue in
-                let gridPoint = canvas.locOnCanvas(CGPoint(x: gridValue, y: 0))
+                let gridPoint = canvas.locOnCanvas(CGPoint(x: 0.0, y: gridValue))
                 Path { context in
-                    context.move(to: CGPoint(x: gridPoint.x, y: 0))
-                    context.addLine(to: CGPoint(x: gridPoint.x, y: canvas.canvasHeight))
+                    context.move(to: CGPoint(x: 0, y: gridPoint.y))
+                    context.addLine(to: CGPoint(x: canvas.canvasWidth, y: gridPoint.y))
                 }
                 .stroke(lineWidth: 0.5)
                 .fill(axisInfo.gridColor)
             }
-            ForEach(axisInfo.labelValues, id: \.self) { value in
-                labelContent(value)
-                    .position(canvas.locOnCanvas(.init(x: axisInfo.axisValue, y: value)).move(offset.width * -2.2, offset.height * 0))
-                    .font(.footnote)
+            ForEach(axisInfo.labelValues, id: \.self) { labelValue in
+                let labelPoint = canvas.locOnCanvas(CGPoint(x: 0, y:labelValue))
+                labelContent(labelValue)
+                    .position(x: axisPoint.x, y: labelPoint.y)
+                let _ = { print("pos \(axisPoint.x), \(labelPoint.y)")}()
             }
+
         }
             
     }

@@ -19,6 +19,10 @@ extension ClosedRange where Bound == Double {
         self.upperBound - self.lowerBound
     }
 
+    public var mid: Double {
+        (self.upperBound + self.lowerBound)/2.0
+    }
+
     public func expand(lowerRatio: Double = 0.0, upperRatio: Double = 0.0) -> ClosedRange {
         let width = self.width
         let lower = self.lowerBound - width * lowerRatio

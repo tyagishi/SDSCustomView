@@ -130,8 +130,16 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     static public func canvasFor(_ size: CGSize, dataPoints: [DataPoint],
                                  xValueRange: ClosedRange<Double>? = nil,
                                  edgeInsetRatio: EdgeInsets = EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)) -> SDSCanvas {
-        let xValueRange = xValueRange ?? (dataPoints.xValueRange ?? 0...10)
-        let yValueRange = dataPoints.yValueRange ?? 0...10
+        var xValueRange = xValueRange ?? (dataPoints.xValueRange ?? 0...10)
+        var yValueRange = dataPoints.yValueRange ?? 0...10
+
+        if xValueRange.width < 1.0 {
+            xValueRange = xValueRange.expand(toLower: 2, toUpper: 2)
+        }
+        if yValueRange.width < 1.0 {
+            yValueRange = yValueRange.expand(toLower: 2, toUpper: 2)
+        }
+
 
         let leadingPadding = edgeInsetRatio.leading * xValueRange.width
         let trailingPadding = edgeInsetRatio.trailing * xValueRange.width
