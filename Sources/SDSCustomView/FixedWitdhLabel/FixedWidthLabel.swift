@@ -37,7 +37,7 @@ public struct FixedWidthLabelAlignment: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    var fixedWidthLabelAlignment: Alignment {
+    public var fixedWidthLabelAlignment: Alignment {
         get {
             return self[FixedWidthLabelAlignment.self]
         }
