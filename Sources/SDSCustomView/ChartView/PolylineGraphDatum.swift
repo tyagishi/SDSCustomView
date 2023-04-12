@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import SDSCGExtension
+import SDSViewExtension
 
 public class PolylineGraphDatum: ObservableObject, Identifiable {
     public let id = UUID()
