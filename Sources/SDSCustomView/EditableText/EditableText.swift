@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EditableText: View {
+public struct EditableText: View {
     @Binding var value: String
     let alignment: Alignment
     @State private var underEditing = false {
@@ -16,13 +16,13 @@ struct EditableText: View {
     @FocusState private var fieldFocus: Bool
     let editClick: Int
     
-    init(value: Binding<String>, editClick: Int = 1, alignment: Alignment = .leading) {
+    public init(value: Binding<String>, editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
         self.alignment = alignment
         self.editClick = editClick
     }
     
-    var body: some View {
+    public var body: some View {
         HStack {
             if underEditing {
                 TextField("title", text: $value)
@@ -36,7 +36,7 @@ struct EditableText: View {
             }
             Button(action: { underEditing.toggle()}, label: { Image(systemName: "pencil") })
         }
-        .onChange(of: fieldFocus) {
+        .onChange(of: fieldFocus) { newValue in 
             if !fieldFocus { underEditing = false }
         }
     }
