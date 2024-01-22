@@ -23,6 +23,11 @@ every view is already used for app but basically all views are under develop for
 
   experimental imple.
 
+## EditableText
+usually Text but it will become TextField with click.
+
+## LongPressableButton
+
 ## TableView
 currently only for macOS
 
