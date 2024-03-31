@@ -3,20 +3,6 @@
 convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
-- EditableText (pure SwiftUI)
-
-   combined Text/TextField 
-
-- FixedWidthLabel (pure SwiftUI)
-
-   Fixed width Text with using template string
- 
-- obsoleted
- - HierarchicalReorderableForEach (OutlineView with Drag&Drop support, pure SwiftUI)
- - ChartView (pure SwiftUI) (will be obosleted soon)
- - OutlineView (based on AppKit)
- - TableView (based on AppKit)
-   
 ## EditableText
 initially Text but it will become TextField with click.
 
@@ -66,10 +52,10 @@ Note: it is NOT ultimately fixed width label.
 in case user modify their text size setting, label width would be affected.
 
 
-## FixedWidthLabel
-
-Sometimes we want to have fixed-width label"s" those have same width.
-Usually we don't mind width value itself, but want to align leading/center/traiing in same width.
-
+## obsoleted
+ - HierarchicalReorderableForEach (OutlineView with Drag&Drop support, pure SwiftUI)
+ - ChartView (pure SwiftUI) (will be obosleted soon)
+ - OutlineView (based on AppKit)
+ - TableView (based on AppKit)
 
 
