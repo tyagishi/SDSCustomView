@@ -15,9 +15,16 @@ public struct EditableText: View {
     }
     @FocusState private var fieldFocus: Bool
     let editClick: Int
+    let placeholder: String
+    let editIcon: Image
     
-    public init(value: Binding<String>, editClick: Int = 1, alignment: Alignment = .leading) {
+    public init(value: Binding<String>, 
+                placeholder: String = "",
+                editIcon: Image = Image(systemName: "pencil"),
+                editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
+        self.placeholder = placeholder
+        self.editIcon = editIcon
         self.alignment = alignment
         self.editClick = editClick
     }
@@ -25,7 +32,8 @@ public struct EditableText: View {
     public var body: some View {
         HStack {
             if underEditing {
-                TextField("title", text: $value)
+                TextField(placeholder,
+                          text: $value)
                     .focused($fieldFocus)
                     .onSubmit { underEditing.toggle() }
             } else {
@@ -34,7 +42,7 @@ public struct EditableText: View {
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { underEditing.toggle() })
             }
-            Button(action: { underEditing.toggle()}, label: { Image(systemName: "pencil") })
+            Button(action: { underEditing.toggle()}, label: { editIcon })
         }
         .onChange(of: fieldFocus) { newValue in 
             if !fieldFocus { underEditing = false }
