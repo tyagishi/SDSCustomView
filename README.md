@@ -6,6 +6,10 @@ every view is already used for app but basically all views are under develop for
 ## EditableText
 initially Text but it will become TextField with click.
 
+### EditableTextBuffered
+TextField but does not update Binding data until onSubmit
+Useful for textField in List, otherwise updating List (comes from updating binding data) will take a way focus from TextField
+
 ## LongPressableButton
 
 ## TableView
