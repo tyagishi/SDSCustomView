@@ -1,5 +1,5 @@
 //
-//  EditableTextCached.swift
+//  EditableTextBuffered.swift
 //
 //  Created by : Tomoaki Yagishita on 2024/04/12
 //  © 2024  SmallDeskSoftware
@@ -69,4 +69,3 @@ public struct EditableTextBuffered: View {
 #Preview {
     EditableText(value: .constant("Hello world"))
 }
-
