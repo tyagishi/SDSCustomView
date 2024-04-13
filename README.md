@@ -6,9 +6,27 @@ every view is already used for app but basically all views are under develop for
 ## EditableText
 initially Text but it will become TextField with click.
 
-option: indirectEdit
+### option: indirectEdit
 Useful for textField in List, otherwise updating List (comes from updating binding data) will take a way focus from TextField
-Note: in indirectEdit-mode, need to type "return" or "loose focus" to apply input to binding
+Note: in indirectEdit-mode, need to have "return" or "loose focus" to apply input to binding
+
+```
+struct ContentView: View {
+    @State private var text = "Hello"
+    @State private var texts = ["Hello", "World"]
+    var body: some View {
+        VStack {
+            EditableText(value: $text)
+            List($texts, id: \.self) { $text in
+                EditableText(value: $text)
+                    .indirectEdit()
+            }
+        }
+        .padding()
+    }
+}
+
+```
 
 ## LongPressableButton
 
