@@ -84,7 +84,7 @@ public struct EditableText: View {
 // MARK: indirectEdit ViewModifier
 struct EditableTextIndirectKey: EnvironmentKey {
     typealias Value = (Bool, Image)
-    static var defaultValue: (Bool, Image) = (true, EditableText.undoIcon)
+    static var defaultValue: (Bool, Image) = (false, EditableText.undoIcon)
 }
 
 extension EnvironmentValues {
