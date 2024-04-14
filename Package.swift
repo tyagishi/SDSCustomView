@@ -22,13 +22,16 @@ let package = Package(
         .package(url: "https://github.com/tyagishi/SDSViewExtension", from: "4.0.0"),
         .package(url: "https://github.com/tyagishi/SwiftUIDebugUtil", from: "2.0.0"),
         .package(url: "https://github.com/tyagishi/SDSDataStructure", from: "3.0.0"),
+        .package(url: "https://github.com/realm/SwiftLint.git", from: "0.54.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "SDSCustomView",
-            dependencies: ["SDSCGExtension", "SDSViewExtension", "SwiftUIDebugUtil", "SDSDataStructure"]),
+            dependencies: ["SDSCGExtension", "SDSViewExtension", "SwiftUIDebugUtil", "SDSDataStructure"],
+            plugins: [ .plugin(name: "SwiftLintPlugin", package: "SwiftLint") ]
+        ),
 //        .testTarget(
 //            name: "SDSCustomViewTests",
 //            dependencies: ["SDSCustomView"]),

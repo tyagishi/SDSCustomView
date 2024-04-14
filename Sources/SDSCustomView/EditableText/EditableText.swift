@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 public struct EditableText: View {
     public static var undoIcon = Image(systemName: "arrow.uturn.backward")
     
@@ -62,9 +61,9 @@ public struct EditableText: View {
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
             }
-            Button(action: { underEditing.toggle()}, label: { editIcon })
+            Button(action: { underEditing.toggle() }, label: { editIcon })
         }
-        .onChange(of: fieldFocus) { newValue in 
+        .onChange(of: fieldFocus) { _ in
             if !fieldFocus { underEditing = false }
         }
     }
@@ -84,6 +83,7 @@ public struct EditableText: View {
 // MARK: indirectEdit ViewModifier
 struct EditableTextIndirectKey: EnvironmentKey {
     typealias Value = (Bool, Image)
+    
     static var defaultValue: (Bool, Image) = (false, EditableText.undoIcon)
 }
 

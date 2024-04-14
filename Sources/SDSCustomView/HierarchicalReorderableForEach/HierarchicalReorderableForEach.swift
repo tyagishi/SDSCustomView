@@ -12,6 +12,7 @@ import SDSDataStructure
 
 let dragTypes = [UTType.text]
 
+// swiftlint:disable all
 public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View {
     var items: [TreeNode<T>]
     @ObservedObject var selection: LimitedOrderedSet<TreeNode<T>>
@@ -19,7 +20,6 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
     @Binding var draggingItem: TreeNode<T>?
     var moveAction: ((IndexPath, IndexPath) -> Void)?
     let content: (TreeNode<T>) -> Content
-
 
     public init( items: [TreeNode<T>],
                  //selection: Binding<Set<TreeNode<T>.ID>>,
@@ -35,6 +35,7 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
         self.moveAction = moveAction
         self.content = content
     }
+    
     public var body: some View {
         ForEach(items) { item in
             HierarchicalReorderableRow(item, selection,
@@ -44,21 +45,21 @@ public struct HierarchicalReorderableForEach<T: Equatable, Content: View>: View 
             })
         }
         // FIXME: onInsert does not work well for ForEach which is embedded in another ForEach....
-        .onInsert(of: dragTypes) { index, providers in
-//            guard let draggingItem = draggingItem else { return }
-//            let currentIndex = current.indexPath()
-//            let fromIndex = draggingItem.indexPath()
-//            print("onInsert node: \(fromIndex) to: \(index) under: \(currentIndex)")
-            print("onInsert index: \(index)")
-//            moveAction(fromIndex, fromIndex)
-        }
-//        .onMove { indexSet, to in
-//            print("onMove \(indexSet), \(to)")
+//        .onInsert(of: dragTypes) { index, providers in
+////            guard let draggingItem = draggingItem else { return }
+////            let currentIndex = current.indexPath()
+////            let fromIndex = draggingItem.indexPath()
+////            print("onInsert node: \(fromIndex) to: \(index) under: \(currentIndex)")
+//            print("onInsert index: \(index)")
+////            moveAction(fromIndex, fromIndex)
 //        }
+////        .onMove { indexSet, to in
+////            print("onMove \(indexSet), \(to)")
+////        }
     }
 }
 
-struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
+public struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
     @ObservedObject var node: TreeNode<T>
     @ObservedObject var selection: LimitedOrderedSet<TreeNode<T>>
     let childKey: ReferenceWritableKeyPath<TreeNode<T>, [TreeNode<T>]>
@@ -91,13 +92,12 @@ struct HierarchicalReorderableRow<T: Equatable, Content: View>: View {
         self.expand = (UserDefaults.standard.value(forKey: node.id.uuidString) as? Bool) ?? false
     }
     
-    var body: some View {
+    public var body: some View {
         DisclosureGroup(isExpanded: $expandFlag, content: {
             HierarchicalReorderableForEach(items: node[keyPath: childKey], selection: selection,
                                            childKey: childKey,
                                            draggingItem: $draggingItem, moveAction: moveAction,
                                            content: content)
-
         }, label: {
             content(node)
                 .onDrag {
@@ -272,5 +272,4 @@ struct DragDelegate<T>: DropDelegate {
 //        guard let draggingItem = draggingItem else { return }
 //    }
 }
-
-
+// swiftlint:enable all

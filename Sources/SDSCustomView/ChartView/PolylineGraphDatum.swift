@@ -13,7 +13,7 @@ import SDSViewExtension
 public class PolylineGraphDatum: ObservableObject, Identifiable {
     public let id = UUID()
 
-    @Published var dataPoints:[DataPoint]
+    @Published var dataPoints: [DataPoint]
     @Published public var canvas: SDSCanvas
 
     //    @Published public var xValueRange: ClosedRange<Double>
@@ -30,7 +30,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     public var yAxisInfo: AxisInfo?
 
     public init(_ dataSet: [DataPoint],
-                linecolor: Color = Color.red, vertexSymbol: @escaping ((DataPoint) -> AnyView) = { _ in EmptyView().anyView()},
+                linecolor: Color = Color.red, vertexSymbol: @escaping ((DataPoint) -> AnyView) = { _ in EmptyView().anyView() },
 //                xValueRange: ClosedRange<Double>? = nil, yValueRange: ClosedRange<Double>? = nil,
 //                size: CGSize,
                 canvas: SDSCanvas) {
@@ -70,11 +70,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         self.yAxisInfo = nil
     }
     
-    var dataSetForGraph: [DataPoint] {
-        get {
-            dataPoints
-        }
-    }
+    var dataSetForGraph: [DataPoint] { dataPoints }
     
     public func hasEnoughData() -> Bool {
         return !dataPoints.isEmpty
@@ -87,7 +83,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         return SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
     }
     
-    static public func suitableCanvasFor(_ size: CGSize,
+    public static func suitableCanvasFor(_ size: CGSize,
                                          xValueRange: ClosedRange<Double>,
                                          yValueRange: ClosedRange<Double>,
                                          xLowerPadding: CGFloat = 0.0,
@@ -128,7 +124,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
 //
 //        return SDSCanvas(llValue: llPoint, xyScale: xyScale, canvasSize: size)
 //    }
-    static public func canvasFor(_ size: CGSize, dataPoints: [DataPoint],
+    public static func canvasFor(_ size: CGSize, dataPoints: [DataPoint],
                                  xValueRange: ClosedRange<Double>? = nil,
                                  edgeInsetRatio: EdgeInsets = EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)) -> SDSCanvas {
         var xValueRange = xValueRange ?? (dataPoints.xValueRange ?? 0...10)
@@ -140,7 +136,6 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
         if yValueRange.width < 1.0 {
             yValueRange = yValueRange.expand(toLower: 2, toUpper: 2)
         }
-
 
         let leadingPadding = edgeInsetRatio.leading * xValueRange.width
         let trailingPadding = edgeInsetRatio.trailing * xValueRange.width
@@ -162,7 +157,7 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
     ///   - yValueRange: y value range
     ///   - edgeInsetRatio: padding in dot
     /// - Returns: canvas for chart
-    static public func canvasFor(_ size: CGSize, xValueRange: ClosedRange<Double>, yValueRange:ClosedRange<Double>,
+    public static func canvasFor(_ size: CGSize, xValueRange: ClosedRange<Double>, yValueRange: ClosedRange<Double>,
                                  edgeInsetRatio: EdgeInsets = EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)) -> SDSCanvas {
         let chartSize = CGSize(width: size.width - edgeInsetRatio.leading - edgeInsetRatio.trailing,
                                height: size.height - edgeInsetRatio.top - edgeInsetRatio.bottom)
@@ -180,5 +175,4 @@ public class PolylineGraphDatum: ObservableObject, Identifiable {
 
         return SDSCanvas(llValue: llPoint, xyScale: CGVector(dx: xScale, dy: yScale), canvasSize: size)
     }
-
 }

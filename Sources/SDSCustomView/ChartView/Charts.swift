@@ -23,7 +23,7 @@ public struct AxisInfo {
 
     public init(axisValue: CGFloat, color: Color,
                 gridValues: [CGFloat] = [], gridColor: Color = .clear,
-                labelValues: [CGFloat], labelContent: @escaping AxisInfo.AxisLabelGen = { _ in EmptyView().anyView() } ) {
+                labelValues: [CGFloat], labelContent: @escaping AxisInfo.AxisLabelGen = { _ in EmptyView().anyView() }) {
         self.axisValue = axisValue
         self.color = color
         self.gridValues = gridValues
@@ -33,18 +33,18 @@ public struct AxisInfo {
     }
 }
 
-public struct Charts<tContent: View, legendView: View>: View {
+public struct Charts<CV: View, LV: View>: View {
     @ObservedObject var graphData: GraphData
     let size: CGSize
 
-    var title: tContent
-    let legend: legendView
+    var title: CV
+    let legend: LV
 
     let xAxis: AxisInfo?
 
     public init(_ graphData: GraphData, size: CGSize,
-                @ViewBuilder title: @escaping (() -> tContent) = { EmptyView() },
-                @ViewBuilder legend: @escaping (() -> legendView) = { EmptyView() },
+                @ViewBuilder title: @escaping (() -> CV) = { EmptyView() },
+                @ViewBuilder legend: @escaping (() -> LV) = { EmptyView() },
                 xAxis: AxisInfo? = nil ) {
         self.graphData = graphData
         self.title = title()
@@ -69,7 +69,6 @@ public struct Charts<tContent: View, legendView: View>: View {
         .frame(size)
     }
 }
-
 
 public struct XAxisView: View {
     public typealias LabelGen = ((CGFloat) -> AnyView)
@@ -111,7 +110,6 @@ public struct XAxisView: View {
                 labelContent(labelValue)
                     .position(x: labelPoint.x, y: axisPoint.y)
             }
-
         }
     }
 }
@@ -149,17 +147,16 @@ public struct YAxisView: View {
                 .fill(axisInfo.gridColor)
             }
             ForEach(axisInfo.labelValues, id: \.self) { labelValue in
-                let labelPoint = canvas.locOnCanvas(CGPoint(x: 0, y:labelValue))
+                let labelPoint = canvas.locOnCanvas(CGPoint(x: 0, y: labelValue))
                 labelContent(labelValue)
                     .position(x: axisPoint.x, y: labelPoint.y)
             }
         }
-            
     }
 }
 
 struct PolylineView: View {
-    @ObservedObject var datum:PolylineGraphDatum
+    @ObservedObject var datum: PolylineGraphDatum
     let canvas: SDSCanvas
 
     init(_ datum: PolylineGraphDatum, canvas: SDSCanvas) {
@@ -170,7 +167,7 @@ struct PolylineView: View {
     var body: some View {
         ZStack {
             // data path
-            if datum.dataSetForGraph.count > 0 {
+            if !datum.dataSetForGraph.isEmpty {
                 Path { path in
                     path.move(to: canvas.locOnCanvas(datum.dataSetForGraph[0].loc))
                     //datum.vertexSymbol
@@ -221,5 +218,3 @@ extension CGRect {
         return CGPoint(x: self.originX * -1, y: self.originY * -1)
     }
 }
-
-

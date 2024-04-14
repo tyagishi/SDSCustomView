@@ -71,16 +71,16 @@ public struct SDSCanvas {
         canvasSize.height
     }
     
+    // swiftlint:disable identifier_name
     func locOnCanvas(_ pos: CGPoint) -> CGPoint {
         let x = (pos.x - self.llValueX) * self.xScale
         let y = (pos.y - self.llValueY) * self.yScale
-        let retPos = invertedY(point: CGPoint(x: x, y: y))
-        return retPos
+        return invertedY(point: CGPoint(x: x, y: y))
     }
     // calc reveresed/scaled point on canvas
     func invertedY(point: CGPoint) -> CGPoint {
         let newY = self.canvasHeight - point.y
         return CGPoint(x: point.x, y: newY)
     }
+    // swiftlint:enable identifier_name
 }
-

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct LongPressableButton<Label>: View  where Label: View{
+public struct LongPressableButton<Label>: View  where Label: View {
     var tapAction: (() -> Void)?
     var longPressDetected: (() -> Void)? = nil
     var longPressAction: (() -> Void )?
@@ -15,8 +15,8 @@ public struct LongPressableButton<Label>: View  where Label: View{
     @State private var longPressed = false
 
     public init(tapAction: (() -> Void)? = nil,
-         longPressDetected: (() -> Void)? = nil,
-         longPressAction: (() -> Void)? = nil, label: @escaping (() -> Label) ) {
+                longPressDetected: (() -> Void)? = nil,
+                longPressAction: (() -> Void)? = nil, label: @escaping (() -> Label) ) {
         self.tapAction = tapAction
         self.longPressDetected = longPressDetected
         self.longPressAction = longPressAction
@@ -35,7 +35,7 @@ public struct LongPressableButton<Label>: View  where Label: View{
             label()
         })
             .simultaneousGesture(
-                LongPressGesture().onEnded{ _ in
+                LongPressGesture().onEnded { _ in
                     longPressDetected?()
                     longPressed = true
                 }

@@ -55,10 +55,9 @@ public struct EditableTextBuffered: View {
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { underEditing.toggle() })
             }
-            Button(action: { underEditing.toggle()}, label: { editIcon })
-            
+            Button(action: { underEditing.toggle() }, label: { editIcon })
         }
-        .onChange(of: fieldFocus) { newValue in
+        .onChange(of: fieldFocus) { _ in
             if !fieldFocus { underEditing = false }
         }
         .onChange(of: [editString, value]) { _ in

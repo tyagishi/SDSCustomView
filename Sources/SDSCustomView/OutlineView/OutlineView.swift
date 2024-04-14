@@ -73,4 +73,3 @@ public struct OutlineView<DataSource: ObservableObject>: NSViewRepresentable {
     public typealias NSViewType = NSScrollView
 }
 #endif
-

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct StatefulButton<OnLabel:View, OffLabel:View> : View {
+public struct StatefulButton<OnLabel: View, OffLabel: View>: View {
     @Binding var bValue: Bool
     var trueLabel: OnLabel
     var falseLabel: OffLabel

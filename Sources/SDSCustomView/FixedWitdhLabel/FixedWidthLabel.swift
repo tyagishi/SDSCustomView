@@ -11,10 +11,12 @@ public struct FixedWidthLabel: View {
     @Environment(\.fixedWidthLabelAlignment) var alignment
     let template: String
     let label: String
+    
     public init(_ label: String,widthFor template: String) {
         self.label = label
         self.template = template
     }
+    
     public var body: some View {
         Text(template)
             .hidden()
@@ -33,7 +35,7 @@ extension FixedWidthLabel {
 
 public struct FixedWidthLabelAlignment: EnvironmentKey {
     public typealias Value = Alignment
-    static public var defaultValue: Alignment = .center
+    public static var defaultValue: Alignment = .center
 }
 
 extension EnvironmentValues {

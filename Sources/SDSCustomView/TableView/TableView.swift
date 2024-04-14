@@ -25,9 +25,10 @@ public struct TableView<DataModel: NSTableViewDataSource & NSTableViewDelegate &
         return Coordinator(dataModel)
     }
     
-    final public class Coordinator<DataModel: NSTableViewDataSource & NSTableViewDelegate & ObservableObject>: NSObject {
-        var dataModel: DataModel
-        init(_ dataModel: DataModel) {
+    public final class Coordinator<CoordinatorDataModel: NSTableViewDataSource & NSTableViewDelegate & ObservableObject>: NSObject {
+        var dataModel: CoordinatorDataModel
+        
+        init(_ dataModel: CoordinatorDataModel) {
             self.dataModel = dataModel
         }
     }

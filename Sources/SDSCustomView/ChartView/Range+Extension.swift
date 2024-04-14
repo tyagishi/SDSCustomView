@@ -20,7 +20,7 @@ extension ClosedRange where Bound == Double {
     }
 
     public var mid: Double {
-        (self.upperBound + self.lowerBound)/2.0
+        (self.upperBound + self.lowerBound) / 2.0
     }
 
     public func expand(lowerRatio: Double = 0.0, upperRatio: Double = 0.0) -> ClosedRange {
