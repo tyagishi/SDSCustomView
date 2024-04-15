@@ -17,6 +17,7 @@ public struct EditableText: View {
         didSet { if underEditing { fieldFocus = true } }
     }
     @FocusState private var fieldFocus: Bool
+    @FocusState private var textFocus: Bool
     let editClick: Int
     let placeholder: String
     let editIcon: Image
@@ -60,13 +61,18 @@ public struct EditableText: View {
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
+                    .focusable()
+                    .focused($textFocus)
             }
             if editClick < Int.max {
-                Button(action: { underEditing.toggle() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
         }
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { underEditing = false }
+        }
+        .onChange(of: textFocus) { _ in
+            if textFocus { toggleUnderEditing() }
         }
     }
     
