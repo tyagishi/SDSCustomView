@@ -28,6 +28,28 @@ struct ContentView: View {
 
 ```
 
+## EditableToken/TokenField
+initially token view but it will become TokenField with click
+note: EditableToken is not implemented yet
+```
+struct ContentView: View {
+    @State private var selectedTokens: [String] = []
+    @State private var tokens = ["Hello", "World"]
+    var body: some View {
+        VStack {
+            let getSet = (getter: {
+                return selectedTokens
+            }, setter: { (newNames: [String]) in
+                selectedTokens = newNames
+            })
+            TokenField(getSet: getSet, selectableTokens: tokens))
+        }
+        .padding()
+    }
+}
+
+```
+
 ## StatefulButton
 
 ## LongPressableButton
