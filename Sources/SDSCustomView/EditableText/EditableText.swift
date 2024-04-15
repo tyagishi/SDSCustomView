@@ -61,7 +61,9 @@ public struct EditableText: View {
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
             }
-            Button(action: { underEditing.toggle() }, label: { editIcon })
+            if editClick < Int.max {
+                Button(action: { underEditing.toggle() }, label: { editIcon })
+            }
         }
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { underEditing = false }
