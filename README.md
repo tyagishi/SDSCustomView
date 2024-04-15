@@ -3,7 +3,7 @@
 convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
-## EditableText
+## EditableText/EditableValue
 initially Text but it will become TextField with click.
 
 ### option: indirectEdit
