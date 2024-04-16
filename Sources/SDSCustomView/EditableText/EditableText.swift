@@ -9,8 +9,8 @@ import SwiftUI
 import OSLog
 
 extension OSLog {
-    fileprivate static var log = Logger(subsystem: "com.smalldesksoftware.sdscustomview", category: "EditableText")
-    //fileprivate static var log = Logger(.disabled)
+    //fileprivate static var log = Logger(subsystem: "com.smalldesksoftware.sdscustomview", category: "EditableText")
+    fileprivate static var log = Logger(.disabled)
 }
 
 public struct EditableText: View {
