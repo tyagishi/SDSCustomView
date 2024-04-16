@@ -28,7 +28,7 @@ struct ContentView: View {
 
 ```
 
-## EditableToken/TokenField
+## EditableToken/TokenField/TokenView
 initially token view but it will become TokenField with click
 note: EditableToken is not implemented yet
 ```
