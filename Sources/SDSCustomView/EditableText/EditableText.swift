@@ -6,6 +6,12 @@
 //
 
 import SwiftUI
+import OSLog
+
+extension OSLog {
+    fileprivate static var log = Logger(subsystem: "com.smalldesksoftware.sdscustomview", category: "EditableText")
+    //fileprivate static var log = Logger(.disabled)
+}
 
 public struct EditableText: View {
     public static var undoIcon = Image(systemName: "arrow.uturn.backward")
@@ -16,14 +22,14 @@ public struct EditableText: View {
     @State private var underEditing = false {
         didSet { if underEditing { fieldFocus = true } }
     }
-    @FocusState private var fieldFocus: Bool
-    @FocusState private var textFocus: Bool
     let editClick: Int
     let placeholder: String
     let editIcon: Image
     @State private var indirectText: String
 
-    public init(value: Binding<String>, 
+    @FocusState private var fieldFocus: Bool
+
+    public init(value: Binding<String>,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
                 editClick: Int = 1, alignment: Alignment = .leading) {
@@ -60,9 +66,10 @@ public struct EditableText: View {
                 Text(value)
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
-                    .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
-                    .focusable()
-                    .focused($textFocus)
+                    .onTapGesture(count: editClick, perform: {
+                        guard editClick < Int.max else { return }
+                        toggleUnderEditing()
+                    })
             }
             if editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
@@ -70,9 +77,6 @@ public struct EditableText: View {
         }
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { underEditing = false }
-        }
-        .onChange(of: textFocus) { _ in
-            if textFocus { toggleUnderEditing() }
         }
     }
     
