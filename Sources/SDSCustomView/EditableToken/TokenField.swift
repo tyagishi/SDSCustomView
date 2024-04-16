@@ -7,11 +7,10 @@
 
 import Foundation
 import SwiftUI
-import Combine
 import OSLog
 
 extension OSLog {
-    //fileprivate static var log = Logger(subsystem: "com.smalldesksoftware.sdstags", category: "TagField")
+    //fileprivate static var log = Logger(subsystem: "com.smalldesksoftware.sdscustomview", category: "TokenField")
     fileprivate static var log = Logger(.disabled)
 }
 
@@ -24,7 +23,6 @@ public struct TokenField: NSViewRepresentable {
     let getSet: EditableTokenGetSet
     let tokenFieldDelegate: TokenFieldDelegate
     let placeholder: String?
-    var cancellable: AnyCancellable? = nil
 
     public init(getSet: EditableTokenGetSet,
                 selectableTokens: [String], placeholder: String? = nil) {
