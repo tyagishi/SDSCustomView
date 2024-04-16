@@ -7,12 +7,10 @@
 
 import SwiftUI
 
-import SwiftUI
-
-fileprivate var undoIcon = Image(systemName: "arrow.uturn.backward")
+private var undoIcon = Image(systemName: "arrow.uturn.backward")
 
 public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInput == V, F.FormatOutput == String {
-    
+    @Environment(\.editableValueForgroundColorKey) var foregroundColor
     @Environment(\.editableTextIndirect) var indirectEdit
     @Binding var value: V
     let formatStyle: F
@@ -55,6 +53,7 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
             if underEditing {
                 TextField(placeholder, value: binding, format: formatStyle)
                     .focused($fieldFocus)
+                    .foregroundStyle(foregroundColor)
                     .onSubmit { toggleUnderEditing() }
                     .multilineTextAlignment(textAlignment(alignment))
                 if indirectEdit.flag {
@@ -64,6 +63,7 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
                 }
             } else {
                 Text(formatStyle.format(indirectValue))
+                    .foregroundStyle(foregroundColor)
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
@@ -103,6 +103,20 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
     EditableText(value: .constant("Hello world"))
 }
 
+// MARK: valueStyle ViewModifier
+struct EditableValueForegroundColorKey: EnvironmentKey {
+    typealias Value = Color
+    
+    static var defaultValue: Color = Color.primary
+}
+
+extension EnvironmentValues {
+    var editableValueForgroundColorKey: Color {
+        get { return self[EditableValueForegroundColorKey.self] }
+        set { self[EditableValueForegroundColorKey.self] = newValue }
+    }
+}
+
 // MARK: indirectEdit ViewModifier
 struct EditableValueIndirectKey: EnvironmentKey {
     typealias Value = (Bool, Image)
@@ -117,9 +131,11 @@ extension EnvironmentValues {
     }
 }
 
-extension EditableValue {
+extension View {
     public func indirectEdit(_ flag: Bool = true, cancelImage: Image = EditableText.undoIcon) -> some View {
         self.environment(\.editableTextIndirect, (flag, cancelImage))
     }
+    public func editValueForgroundColor(_ color: Color) -> some View {
+        self.environment(\.editableValueForgroundColorKey, color)
+    }
 }
-
