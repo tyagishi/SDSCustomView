@@ -54,7 +54,6 @@ public class TokenFieldDelegate: NSObject, NSTokenFieldDelegate {
         guard let tokenField = obj.object as? NSTokenField,
               let stringArray = tokenField.objectValue as? [String] else { return }
 
-
         let oldTagStrArray = getSet.getter()
         if !oldTagStrArray.sameContents(stringArray) {
             getSet.setter(stringArray)
