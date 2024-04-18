@@ -13,14 +13,14 @@ public struct AsyncView<T: Sendable, PV: View, DV: View>: View {
     let content: (T) -> DV
     let placeholder: PV
     let dataProvider: () async -> T
-    let updateProvider: AnyPublisher<T,Never>
+    let updateProvider: AnyPublisher<T,Never>?
 
     @State private var currentData: T? = nil
 
     public init(content: @escaping (T) -> DV,
                 placeholder: () -> PV,
                 dataProvider: @escaping () async -> T,
-                updateProvider: AnyPublisher<T,Never>) {
+                updateProvider: AnyPublisher<T,Never>? = nil) {
         self.content = content
         //self.updatePub = update
         self.placeholder = placeholder()
