@@ -36,12 +36,11 @@ public struct AsyncView<T: Sendable, PV: View, DV: View>: View {
                 placeholder
             }
         }
-        .onAppear {
-            Task { @MainActor in
-                currentData = await dataProvider()
-            }
+        .task {
+            let providedData = await dataProvider()
+            currentData = providedData
         }
-        .optionalOnReceive(updateProvider, perform: { value in
+        .optionalOnReceive(updateProvider?.receive(on: RunLoop.main), perform: { value in
             currentData = value
         })
     }
