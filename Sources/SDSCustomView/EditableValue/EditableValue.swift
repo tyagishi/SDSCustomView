@@ -67,8 +67,10 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
-                    .focusable()
                     .focused($textFocus)
+                #if os(macOS)
+                    .focusable()
+                #endif
             }
             if editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { editIcon })

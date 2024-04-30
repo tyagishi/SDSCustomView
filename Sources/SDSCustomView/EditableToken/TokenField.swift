@@ -49,13 +49,20 @@ public struct TokenField: NSViewRepresentable {
     }
 }
 #else
-struct TokenField: View {
-//    let element: any Taggable
-//    let selectableTags: [any TagProtocol]
+public struct TokenField: View {
+    let getSet: EditableTokenGetSet
+    let placeholder: String?
+    
+    public init(getSet: EditableTokenGetSet,
+                selectableTokens: [String], placeholder: String? = nil) {
+        OSLog.log.debug(#function)
+        self.getSet = getSet
+        self.placeholder = placeholder
+    }
 
-    var body: some View {
+    public var body: some View {
         fatalError("not implemented yet")
-        TextField("Tags", text: .constant("Tag1, Tag2"))
+        //TextField("Tags", text: .constant("Tag1, Tag2"))
     }
 }
 #endif

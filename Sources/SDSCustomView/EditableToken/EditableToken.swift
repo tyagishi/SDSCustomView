@@ -52,7 +52,9 @@ public struct EditableToken: View {
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
+                #if os(macOS)
                     .focusable()
+                #endif
             }
             if editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
@@ -67,26 +69,3 @@ public struct EditableToken: View {
         underEditing.toggle()
     }
 }
-//#Preview {
-//    EditableText(value: .constant("Hello world"))
-//}
-//
-////// MARK: indirectEdit ViewModifier
-////struct EditableTextIndirectKey: EnvironmentKey {
-////    typealias Value = (Bool, Image)
-////    
-////    static var defaultValue: (Bool, Image) = (false, EditableText.undoIcon)
-////}
-////
-////extension EnvironmentValues {
-////    var editableTextIndirect: (flag: Bool, image: Image) {
-////        get { return self[EditableTextIndirectKey.self] }
-////        set { self[EditableTextIndirectKey.self] = newValue }
-////    }
-////}
-////
-////extension EditableText {
-////    public func indirectEdit(_ flag: Bool = true, cancelImage: Image = EditableText.undoIcon) -> some View {
-////        self.environment(\.editableTextIndirect, (flag, cancelImage))
-////    }
-////}
