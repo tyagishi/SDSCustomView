@@ -71,31 +71,42 @@ public class TokenFieldDelegate: NSObject, NSTokenFieldDelegate {
         let restTagNames = selectableTokens.filter({ !strings.contains($0) })
 
         // MARK: may need to be controlled from outside (like case sensitive?, checking prefix is too much?, need to hide unrelated?, ...)
+        var prio0: [String] = []
         var prio1: [String] = []
         var prio2: [String] = []
         var prio3: [String] = []
         for name in restTagNames {
-            if name.hasSuffix(substring) { prio1.append(name)
+            if name.hasPrefix(substring) { prio0.append(name)
+            } else if name.capitalized.hasPrefix(substring.capitalized) { prio1.append(name)
             } else if name.contains(substring) { prio2.append(name)
             } else { prio3.append(name)}
         }
-        
+
+        prio0.sort()
         prio1.sort()
         prio2.sort()
         prio3.sort()
 
-        let completion = prio1 + prio2 + prio3
+        let completion = prio0 + prio1 + prio2 + prio3
         
         guard !completion.isEmpty else { return [noCompletionString] }
         return completion
     }
     
+    public func tokenField(_ tokenField: NSTokenField, displayStringForRepresentedObject representedObject: Any) -> String? {
+        OSLog.log.debug(#function)
+        if let repre = representedObject as? String? { return repre }
+        return nil
+    }
+    
     public func tokenField(_ tokenField: NSTokenField, editingStringForRepresentedObject representedObject: Any) -> String? {
+        OSLog.log.debug(#function)
         if let repre = representedObject as? String? { return repre }
         return nil
     }
     
     public func tokenField(_ tokenField: NSTokenField, shouldAdd tokens: [Any], at index: Int) -> [Any] {
+        OSLog.log.debug(#function)
         guard let strings = tokens as? [String] else { return tokens }
         return strings.filter({ $0 != noCompletionString })
     }
