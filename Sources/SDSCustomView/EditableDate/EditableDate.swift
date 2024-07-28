@@ -15,6 +15,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
     @Binding var date: Date
     let formatStyle: F
     let alignment: Alignment
+    let displayComponents: DatePickerComponents
     @State private var underEditing = false {
         didSet { if underEditing { fieldFocus = true } }
     }
@@ -26,15 +27,18 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
     @State private var indirectValue: Date
 
     public init(date: Binding<Date>,
-                format: F,
+                format: F = Date.FormatStyle(),
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
-                editClick: Int = 1, alignment: Alignment = .leading) {
+                editClick: Int = 1,
+                displayComponents: DatePickerComponents = [.hourAndMinute, .date],
+                alignment: Alignment = .leading) {
         self._date = date
         self.formatStyle = format
         self.placeholder = placeholder
         self.editIcon = editIcon
         self.alignment = alignment
+        self.displayComponents = displayComponents
         self.editClick = editClick
         
         indirectValue = date.wrappedValue
@@ -51,8 +55,9 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         
         HStack {
             if underEditing {
-                //DatePicker(selection: binding, label: <#T##() -> View#>)
-                TextField(placeholder, value: binding, format: formatStyle)
+                DatePicker(selection: binding,
+                           displayedComponents: displayComponents,
+                           label: { Text("") })
                     .focused($fieldFocus)
                     .foregroundStyle(foregroundColor)
                     .onSubmit { toggleUnderEditing() }
@@ -102,6 +107,6 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         }
     }
 }
-//#Preview {
-//    EditableDate(date: .constant(Date()))
-//}
+#Preview {
+    EditableDate(date: .constant(Date()))
+}
