@@ -53,7 +53,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
             date = newValue
         })
         
-        HStack {
+        HStack(spacing: 2) {
             if underEditing {
                 DatePicker(selection: binding,
                            displayedComponents: displayComponents,
@@ -109,4 +109,9 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
 }
 #Preview {
     EditableDate(date: .constant(Date()))
+        .indirectEdit()
+        .fixedSize()
+        .frame(width: 800, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .border(.green)
 }
