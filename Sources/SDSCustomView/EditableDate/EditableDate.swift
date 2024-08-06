@@ -65,6 +65,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
                            label: { Text("") })
                     .focused($fieldFocus)
                     .foregroundStyle(foregroundColor)
+                    .labelsHidden()
                     .onSubmit { toggleUnderEditing() }
                     .multilineTextAlignment(textAlignment(alignment))
                 if indirectEdit.flag {
