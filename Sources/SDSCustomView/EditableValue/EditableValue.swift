@@ -12,6 +12,7 @@ private var undoIcon = Image(systemName: "arrow.uturn.backward")
 public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInput == V, F.FormatOutput == String {
     @Environment(\.editableValueForgroundColorKey) var foregroundColor
     @Environment(\.editableTextIndirect) var indirectEdit
+    @Environment(\.editableViewEditButtonLocation) var editButtonLocation
     @Binding var value: V
     let formatStyle: F
     let alignment: Alignment
@@ -50,6 +51,10 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
         })
         
         HStack {
+            if editButtonLocation == .leading,
+               editClick < Int.max {
+                Button(action: { toggleUnderEditing() }, label: { editIcon })
+            }
             if underEditing {
                 TextField(placeholder, value: binding, format: formatStyle)
                     .focused($fieldFocus)
@@ -72,7 +77,8 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
                     .focusable()
                 #endif
             }
-            if editClick < Int.max {
+            if editButtonLocation == .trailing,
+               editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
         }
@@ -106,6 +112,16 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
 }
 
 // MARK: valueStyle ViewModifier
+struct EditableViewEditButtonLocationKey: EnvironmentKey {
+    static let defaultValue = TextAlignment.leading
+}
+extension EnvironmentValues {
+    var editableViewEditButtonLocation: TextAlignment {
+        get { return self[EditableViewEditButtonLocationKey.self] }
+        set { self[EditableViewEditButtonLocationKey.self] = newValue }
+    }
+}
+
 struct EditableValueForegroundColorKey: EnvironmentKey {
     typealias Value = Color
     

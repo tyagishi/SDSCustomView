@@ -14,7 +14,8 @@ let editableTokenFocusLooseRequestNotification = Notification.Name("EditableToke
 
 public struct EditableToken: View {
     public static var undoIcon = Image(systemName: "arrow.uturn.backward")
-    
+    @Environment(\.editableViewEditButtonLocation) var editButtonLocation
+
     let getSet: EditableTokenGetSet
     let selectableTokens: [String]
     let placeholder: String
@@ -43,6 +44,10 @@ public struct EditableToken: View {
     
     public var body: some View {
         HStack {
+            if editButtonLocation == .leading,
+               editClick < Int.max {
+                Button(action: { toggleUnderEditing() }, label: { editIcon })
+            }
             if underEditing {
                 TokenField(getSet: getSet, selectableTokens: selectableTokens)
                     .focused($fieldFocus)
@@ -56,7 +61,8 @@ public struct EditableToken: View {
                     .focusable()
                 #endif
             }
-            if editClick < Int.max {
+            if editButtonLocation == .trailing,
+               editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
         }

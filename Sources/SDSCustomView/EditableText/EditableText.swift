@@ -17,6 +17,7 @@ public struct EditableText: View {
     public static var undoIcon = Image(systemName: "arrow.uturn.backward")
     
     @Environment(\.editableTextIndirect) var indirectEdit
+    @Environment(\.editableViewEditButtonLocation) var editButtonLocation
     @Binding var value: String
     let alignment: Alignment
     @State private var underEditing = false {
@@ -52,6 +53,10 @@ public struct EditableText: View {
         })
         
         HStack {
+            if editButtonLocation == .leading,
+               editClick < Int.max {
+                Button(action: { toggleUnderEditing() }, label: { editIcon })
+            }
             if underEditing {
                 TextField(placeholder,
                           text: binding)
@@ -71,7 +76,8 @@ public struct EditableText: View {
                         toggleUnderEditing()
                     })
             }
-            if editClick < Int.max {
+            if editButtonLocation == .trailing,
+               editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
         }

@@ -12,6 +12,7 @@ private var undoIcon = Image(systemName: "arrow.uturn.backward")
 public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput == Date, F.FormatOutput == String {
     @Environment(\.editableValueForgroundColorKey) var foregroundColor
     @Environment(\.editableTextIndirect) var indirectEdit
+    @Environment(\.editableViewEditButtonLocation) var editButtonLocation
     @Binding var date: Date
     let formatStyle: F
     let alignment: Alignment
@@ -54,6 +55,10 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         })
         
         HStack(spacing: 2) {
+            if editButtonLocation == .leading,
+               editClick < Int.max {
+                Button(action: { toggleUnderEditing() }, label: { editIcon })
+            }
             if underEditing {
                 DatePicker(selection: binding,
                            displayedComponents: displayComponents,
@@ -78,7 +83,8 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
                     .focusable()
                 #endif
             }
-            if editClick < Int.max {
+            if editButtonLocation == .trailing,
+               editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
         }
