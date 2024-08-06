@@ -112,38 +112,42 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
 }
 
 // MARK: valueStyle ViewModifier
-struct EditableViewEditButtonLocationKey: EnvironmentKey {
-    static let defaultValue = TextAlignment.leading
+public struct EditableViewEditButtonLocationKey: EnvironmentKey {
+    public typealias Value = TextAlignment
+    public static let defaultValue = TextAlignment.leading
 }
 extension EnvironmentValues {
-    var editableViewEditButtonLocation: TextAlignment {
+    public var editableViewEditButtonLocation: TextAlignment {
         get { return self[EditableViewEditButtonLocationKey.self] }
         set { self[EditableViewEditButtonLocationKey.self] = newValue }
     }
 }
+extension View {
+    public func editButtonLocation(_ alignment: TextAlignment = .leading) -> some View {
+        self.environment(\.editableViewEditButtonLocation, alignment)
+    }
+}
 
-struct EditableValueForegroundColorKey: EnvironmentKey {
-    typealias Value = Color
-    
-    static var defaultValue: Color = Color.primary
+public struct EditableValueForegroundColorKey: EnvironmentKey {
+    public typealias Value = Color
+    public static var defaultValue: Color = Color.primary
 }
 
 extension EnvironmentValues {
-    var editableValueForgroundColorKey: Color {
+    public var editableValueForgroundColorKey: Color {
         get { return self[EditableValueForegroundColorKey.self] }
         set { self[EditableValueForegroundColorKey.self] = newValue }
     }
 }
 
 // MARK: indirectEdit ViewModifier
-struct EditableValueIndirectKey: EnvironmentKey {
-    typealias Value = (Bool, Image)
-    
-    static var defaultValue: (Bool, Image) = (false, EditableText.undoIcon)
+public struct EditableValueIndirectKey: EnvironmentKey {
+    public typealias Value = (Bool, Image)
+    public static var defaultValue: (Bool, Image) = (false, EditableText.undoIcon)
 }
 
 extension EnvironmentValues {
-    var editableValueIndirect: (flag: Bool, image: Image) {
+    public var editableValueIndirect: (flag: Bool, image: Image) {
         get { return self[EditableValueIndirectKey.self] }
         set { self[EditableValueIndirectKey.self] = newValue }
     }
