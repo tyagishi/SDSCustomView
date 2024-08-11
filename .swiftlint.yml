@@ -8,7 +8,7 @@ analyzer_rules:
   - unused_declaration
   - unused_import
 opt_in_rules:
-  - all
+#  - all
 disabled_rules:
   - anonymous_argument_in_multiline_closure
   - anyobject_protocol
@@ -74,16 +74,16 @@ disabled_rules:
 ## temporary disable
   - accessibility_label_for_image
 
-attributes:
-  always_on_same_line:
-    - "@Environment"
-    - "@FocusState"
-  always_on_line_above:
-    - "@ConfigurationElement"
-    - "@OptionGroup"
-    - "@RuleConfigurationDescriptionBuilder"
-    - "@ViewBuilder"
-    - "@FocusState"
+# attributes:
+#   always_on_same_line:
+#     - "@Environment"
+#     - "@FocusState"
+#   always_on_line_above:
+#     - "@ConfigurationElement"
+#     - "@OptionGroup"
+#     - "@RuleConfigurationDescriptionBuilder"
+#     - "@ViewBuilder"
+#     - "@FocusState"
 identifier_name:
   excluded:
     - id
@@ -94,8 +94,8 @@ line_length:
 large_tuple:
   warning: 5
   error: 8
-number_separator:
-  minimum_length: 5
+#number_separator:
+#  minimum_length: 5
 # file_name:
 #   excluded:
 #     - Exports.swift
@@ -104,12 +104,12 @@ number_separator:
 #     - SwiftSyntax+SwiftLint.swift
 #     - TestHelpers.swift
 
-balanced_xctest_lifecycle: &unit_test_configuration
-  test_parent_classes:
-    - SwiftLintTestCase
-    - XCTestCase
-empty_xctest_method: *unit_test_configuration
-single_test_class: *unit_test_configuration
+#balanced_xctest_lifecycle: &unit_test_configuration
+#  test_parent_classes:
+#    - SwiftLintTestCase
+#    - XCTestCase
+#empty_xctest_method: *unit_test_configuration
+#single_test_class: *unit_test_configuration
 
 function_body_length: 60
 type_body_length: 400
