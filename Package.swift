@@ -29,7 +29,7 @@ let package = Package(
         .target(
             name: "SDSCustomView",
             dependencies: ["SDSCGExtension", "SDSViewExtension", "SDSDataStructure"],
-            plugins: [ .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLint") ]
+            plugins: [ .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins") ]
         ),
 //        .testTarget(
 //            name: "SDSCustomViewTests",
