@@ -1,41 +1,41 @@
 //
-//  EditableText.swift
+//  EditablePicker.swift
 //
-//  Created by : Tomoaki Yagishita on 2024/01/22
+//  Created by : Tomoaki Yagishita on 2024/08/11
 //  © 2024  SmallDeskSoftware
 //
 
 import SwiftUI
-import OSLog
 
-extension OSLog {
-    //fileprivate static var log = Logger(subsystem: "com.smalldesksoftware.sdscustomview", category: "EditableText")
-    fileprivate static var log = Logger(.disabled)
-}
-
-public struct EditableText: View {
-    public static var undoIcon = Image(systemName: "arrow.uturn.backward")
+public struct EditablePicker<Content: View, Selection: Hashable>: View {
+    var undoIcon = Image(systemName: "arrow.uturn.backward")
     
     @Environment(\.editableTextIndirect) var indirectEdit
     @Environment(\.editableViewEditButtonLocation) var editButtonLocation
-    @Binding var value: String
+    @Binding var value: Selection
     let alignment: Alignment
     @State private var underEditing = false {
         didSet { if underEditing { fieldFocus = true } }
     }
     let editClick: Int
     let placeholder: String
+    let pickerContent: Content
+    let formatter: (Selection) -> String
     let editIcon: Image
-    @State private var indirectText: String
+    @State private var indirectText: Selection
 
     @FocusState private var fieldFocus: Bool
 
-    public init(value: Binding<String>,
+    public init(value: Binding<Selection>,
                 placeholder: String = "",
+                @ViewBuilder pickerContent: @escaping (() -> Content),
+                formatter: @escaping ((Selection) -> String),
                 editIcon: Image = Image(systemName: "pencil"),
                 editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
         self.placeholder = placeholder
+        self.pickerContent = pickerContent()
+        self.formatter = formatter
         self.editIcon = editIcon
         self.alignment = alignment
         self.editClick = editClick
@@ -44,7 +44,7 @@ public struct EditableText: View {
     }
     
     public var body: some View {
-        let binding = Binding<String>(get: {
+        let binding = Binding<Selection>(get: {
             if indirectEdit.flag { return indirectText }
             return value
         }, set: { newText in
@@ -58,8 +58,9 @@ public struct EditableText: View {
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
             if underEditing {
-                TextField(placeholder,
-                          text: binding)
+                Picker(selection: binding, content: {
+                    pickerContent
+                }, label: { Text("Title") }).labelsHidden()
                     .focused($fieldFocus)
                     .onSubmit { toggleUnderEditing() }
                 if indirectEdit.flag {
@@ -68,7 +69,7 @@ public struct EditableText: View {
                         underEditing.toggle()}, label: { indirectEdit.image })
                 }
             } else {
-                Text(value)
+                Text(formatter(value))
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: {
@@ -92,28 +93,5 @@ public struct EditableText: View {
             value = indirectText
         }
         underEditing.toggle()
-    }
-}
-#Preview {
-    EditableText(value: .constant("Hello world"))
-}
-
-// MARK: indirectEdit ViewModifier
-struct EditableTextIndirectKey: EnvironmentKey {
-    typealias Value = (Bool, Image)
-    
-    static var defaultValue: (Bool, Image) = (false, EditableText.undoIcon)
-}
-
-extension EnvironmentValues {
-    public var editableTextIndirect: (flag: Bool, image: Image) {
-        get { return self[EditableTextIndirectKey.self] }
-        set { self[EditableTextIndirectKey.self] = newValue }
-    }
-}
-
-extension EditableText {
-    public func indirectEdit(_ flag: Bool = true, cancelImage: Image = EditableText.undoIcon) -> some View {
-        self.environment(\.editableTextIndirect, (flag, cancelImage))
     }
 }
