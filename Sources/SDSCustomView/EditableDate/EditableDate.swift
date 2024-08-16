@@ -90,7 +90,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
             }
         }
         .onChange(of: fieldFocus) { _ in
-            if !fieldFocus { underEditing = false }
+            if !fieldFocus { toggleUnderEditing() }
         }
         .onChange(of: textFocus) { _ in
             if textFocus { toggleUnderEditing() }
