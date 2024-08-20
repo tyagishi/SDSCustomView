@@ -9,7 +9,7 @@ import SwiftUI
 
 private var undoIcon = Image(systemName: "arrow.uturn.backward")
 
-public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInput == V, F.FormatOutput == String {
+public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F.FormatInput == V, F.FormatOutput == String {
     @Environment(\.editableValueForgroundColorKey) var foregroundColor
     @Environment(\.editableTextIndirect) var indirectEdit
     @Environment(\.editableViewEditButtonLocation) var editButtonLocation
@@ -82,6 +82,9 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
         }
+        .onChange(of: value, perform: { _ in
+            indirectValue = value
+        })
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { underEditing = false }
         }
@@ -95,6 +98,7 @@ public struct EditableValue<V, F: ParseableFormatStyle>: View where F.FormatInpu
            underEditing == true {
             value = indirectValue
         }
+        indirectValue = value
         underEditing.toggle()
     }
     
