@@ -95,6 +95,9 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         .onChange(of: textFocus) { _ in
             if textFocus { toggleUnderEditing() }
         }
+        .onChange(of: date, perform: { _ in
+            indirectValue = date
+        })
     }
     
     func toggleUnderEditing() {

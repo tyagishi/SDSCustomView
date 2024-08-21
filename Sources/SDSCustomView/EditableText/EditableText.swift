@@ -84,6 +84,9 @@ public struct EditableText: View {
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { underEditing = false }
         }
+        .onChange(of: value, perform: { _ in
+            indirectText = value
+        })
     }
     
     func toggleUnderEditing() {
