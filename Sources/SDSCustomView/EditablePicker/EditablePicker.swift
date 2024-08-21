@@ -92,6 +92,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
            underEditing == true {
             value = indirectText
         }
+        indirectText = value
         underEditing.toggle()
     }
 }

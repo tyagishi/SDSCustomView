@@ -102,6 +102,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
            underEditing == true {
             date = indirectValue
         }
+        indirectValue = date
         underEditing.toggle()
     }
     

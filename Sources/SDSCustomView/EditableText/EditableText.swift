@@ -91,6 +91,7 @@ public struct EditableText: View {
            underEditing == true {
             value = indirectText
         }
+        indirectText = value
         underEditing.toggle()
     }
 }
