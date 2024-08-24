@@ -55,11 +55,11 @@ public struct EditableText: View {
         HStack {
             if editButtonLocation == .leading,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { editIcon }).tag("LeadingButton")
             }
             if underEditing {
                 TextField(placeholder,
-                          text: binding)
+                          text: binding).tag("EditableTextField")
                     .focused($fieldFocus)
                     .onSubmit { toggleUnderEditing() }
                 if indirectEdit.flag {
@@ -68,7 +68,7 @@ public struct EditableText: View {
                         underEditing.toggle()}, label: { indirectEdit.image })
                 }
             } else {
-                Text(value)
+                Text(value).tag("EditableTextView")
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: {
@@ -78,7 +78,7 @@ public struct EditableText: View {
             }
             if editButtonLocation == .trailing,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { editIcon }).tag("TrailingButton")
             }
         }
         .onChange(of: fieldFocus) { _ in
