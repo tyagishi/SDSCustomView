@@ -55,7 +55,7 @@ final class EditableText_Tests: XCTestCase {
     }
     
     @MainActor
-    func test_tapThenTextFieldWillAppearThenEditThenGoBack() async throws {
+    func test_tapThenTextFieldBecomeActiveThenEditThenGoBack() async throws {
         let binding = Binding(wrappedValue: "Test")
         var sut = EditableText(value: binding)
 
