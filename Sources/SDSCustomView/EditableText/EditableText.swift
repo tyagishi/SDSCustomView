@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 import OSLog
 
 extension OSLog {
@@ -29,7 +30,8 @@ public struct EditableText: View {
     @State private var indirectText: String
 
     @FocusState private var fieldFocus: Bool
-
+    internal var didAppear: ((Self) -> Void)? // 1.
+    
     public init(value: Binding<String>,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
@@ -55,11 +57,11 @@ public struct EditableText: View {
         HStack {
             if editButtonLocation == .leading,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon }).tag("LeadingButton")
+                Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
             if underEditing {
                 TextField(placeholder,
-                          text: binding).tag("EditableTextField")
+                          text: binding)
                     .focused($fieldFocus)
                     .onSubmit { toggleUnderEditing() }
                 if indirectEdit.flag {
@@ -68,7 +70,7 @@ public struct EditableText: View {
                         underEditing.toggle()}, label: { indirectEdit.image })
                 }
             } else {
-                Text(value).tag("EditableTextView")
+                Text(value)
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: {
@@ -78,7 +80,7 @@ public struct EditableText: View {
             }
             if editButtonLocation == .trailing,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon }).tag("TrailingButton")
+                Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
         }
         .onChange(of: fieldFocus) { _ in
@@ -87,6 +89,7 @@ public struct EditableText: View {
         .onChange(of: value, perform: { _ in
             indirectText = value
         })
+        .onAppear { self.didAppear?(self) } // 2.
     }
     
     func toggleUnderEditing() {
