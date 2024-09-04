@@ -14,14 +14,38 @@ extension OSLog {
     fileprivate static var log = Logger(.disabled)
 }
 
+public enum EditableMode {
+    case editable, view, edit
+}
+
+
+/// EditableText: Text/TextField for string value
+/// value: string value for editing
+/// alignment: alignment for Text
+/// editClick: click num for entering text
+/// placeholder: placeholder for TextField
+/// editIcon: icon for edit button
+///
+/// note:
+/// non-editable mode iff editClick == Int.max
+/// EnvironmentValues:
+///   indirectEdit: Bool
+///         iff true typing will NOT affect value until return (bool
+///   editButtonLocation: .leading/.trailing
+///         edit button location
+///   editableMode: .editable/.view/.edit
+///         view: only Text appear
+///         edit: only TextField appear
+///         editable: Text/TextField will be toggled
 public struct EditableText: View {
     public static var undoIcon = Image(systemName: "arrow.uturn.backward")
     
     @Environment(\.editableTextIndirect) var indirectEdit
     @Environment(\.editableViewEditButtonLocation) var editButtonLocation
     @Binding var value: String
+    let editableMode: EditableMode
     let alignment: Alignment
-    @State private var underEditing = false {
+    @State private var underEditing: Bool {
         didSet { if underEditing { fieldFocus = true } }
     }
     let editClick: Int
@@ -33,14 +57,18 @@ public struct EditableText: View {
     internal var didAppear: ((Self) -> Void)? // 1.
     
     public init(value: Binding<String>,
+                initMode: EditableMode = .editable,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
                 editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
+        self.editableMode = initMode
         self.placeholder = placeholder
         self.editIcon = editIcon
         self.alignment = alignment
         self.editClick = editClick
+
+        underEditing = (initMode == .edit)
         
         indirectText = value.wrappedValue
     }
@@ -75,6 +103,7 @@ public struct EditableText: View {
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: {
                         guard editClick < Int.max else { return }
+                        guard editableMode != .view else { return }
                         toggleUnderEditing()
                     })
             }

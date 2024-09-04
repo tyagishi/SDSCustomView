@@ -80,4 +80,26 @@ final class EditableText_Tests: XCTestCase {
         
         await fulfillment(of: [exp], timeout: 3)
     }
+    
+    @MainActor
+    func test_startWithEditModeThenGotoViewMode() async throws {
+        let binding = Binding(wrappedValue: "Test")
+        var sut = EditableText(value: binding, initMode: .edit)
+
+        let exp = sut.on(\.didAppear) { view in
+            let button = try XCTUnwrap(try view.implicitAnyView().hStack().button(0))
+
+
+            let textField = try view.implicitAnyView().hStack().tupleView(1).textField(0)
+            XCTAssertEqual(try textField.input(), "Test")
+
+            try button.tap()
+
+            let text = try XCTUnwrap(try view.implicitAnyView().hStack().text(1))
+            XCTAssertEqual(try text.string(), "Test")
+        }
+        ViewHosting.host(view: sut)
+        
+        await fulfillment(of: [exp], timeout: 3)
+    }
 }

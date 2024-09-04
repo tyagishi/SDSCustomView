@@ -15,6 +15,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
     @Environment(\.editableViewEditButtonLocation) var editButtonLocation
     @Binding var value: V
     let formatStyle: F
+    let editableMode: EditableMode
     let alignment: Alignment
     @State private var underEditing = false {
         didSet { if underEditing { fieldFocus = true } }
@@ -28,17 +29,20 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
 
     public init(value: Binding<V>,
                 format: F,
+                initMode: EditableMode = .editable,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
                 editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
         self.formatStyle = format
+        self.editableMode = initMode
         self.placeholder = placeholder
         self.editIcon = editIcon
         self.alignment = alignment
         self.editClick = editClick
         
         indirectValue = value.wrappedValue
+        underEditing = (initMode == .edit)
     }
     
     public var body: some View {
