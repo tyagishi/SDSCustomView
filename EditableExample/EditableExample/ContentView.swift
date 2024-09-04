@@ -43,6 +43,8 @@ struct EditableValueExample: View {
     var body: some View {
         VStack {
             EditableValue(value: $value, format: IntegerFormatStyle.number)
+            EditableValue(value: $value, format: IntegerFormatStyle.number, initMode: .edit)
+//                .indirectEdit()
             EditableValue(value: $value, format: IntegerFormatStyle.number)
                 .indirectEdit()
 

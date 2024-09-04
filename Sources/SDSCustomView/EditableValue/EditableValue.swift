@@ -17,7 +17,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
     let formatStyle: F
     let editableMode: EditableMode
     let alignment: Alignment
-    @State private var underEditing = false {
+    @State private var underEditing: Bool {
         didSet { if underEditing { fieldFocus = true } }
     }
     @FocusState private var fieldFocus: Bool
