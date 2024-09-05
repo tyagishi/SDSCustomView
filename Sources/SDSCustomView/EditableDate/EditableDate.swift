@@ -17,7 +17,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
     let formatStyle: F
     let alignment: Alignment
     let displayComponents: DatePickerComponents
-    @State private var underEditing = false {
+    @State private var underEditing: Bool {
         didSet { if underEditing { fieldFocus = true } }
     }
     @FocusState private var fieldFocus: Bool
@@ -29,6 +29,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
 
     public init(date: Binding<Date>,
                 format: F = Date.FormatStyle(),
+                initMode: EditableMode = .editable,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
                 editClick: Int = 1,
@@ -43,6 +44,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         self.editClick = editClick
         
         indirectValue = date.wrappedValue
+        underEditing = (initMode == .edit)
     }
     
     public var body: some View {
