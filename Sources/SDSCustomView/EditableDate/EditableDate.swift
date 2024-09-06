@@ -19,7 +19,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
     let alignment: Alignment
     let displayComponents: DatePickerComponents
     @State private var underEditing: Bool {
-        didSet { if underEditing { fieldFocus = true }; print("underEditing changed to \(underEditing)") }
+        didSet { if underEditing { fieldFocus = true } }
     }
     @FocusState private var fieldFocus: Bool
     @FocusState private var textFocus: Bool
