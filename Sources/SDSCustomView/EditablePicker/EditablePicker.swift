@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDSViewExtension
 
 public struct EditablePicker<Content: View, Selection: Hashable>: View {
     var undoIcon = Image(systemName: "arrow.uturn.backward")
@@ -14,7 +15,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
     @Environment(\.editableViewEditButtonLocation) var editButtonLocation
     @Binding var value: Selection
     let alignment: Alignment
-    @State private var underEditing = false {
+    @State private var underEditing: Bool {
         didSet { if underEditing { fieldFocus = true } }
     }
     let editClick: Int
@@ -22,11 +23,12 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
     let pickerContent: Content
     let formatter: (Selection) -> String
     let editIcon: Image
-    @State private var indirectText: Selection
+    @State private var indirectValue: Selection
 
     @FocusState private var fieldFocus: Bool
 
     public init(value: Binding<Selection>,
+                initMode: EditableMode = .editable,
                 placeholder: String = "",
                 @ViewBuilder pickerContent: @escaping (() -> Content),
                 formatter: @escaping ((Selection) -> String),
@@ -40,16 +42,16 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
         self.alignment = alignment
         self.editClick = editClick
         
-        indirectText = value.wrappedValue
+        indirectValue = value.wrappedValue
+        underEditing = (initMode == .edit)
     }
     
     public var body: some View {
         let binding = Binding<Selection>(get: {
-            if indirectEdit.flag { return indirectText }
-            return value
-        }, set: { newText in
-            if indirectEdit.flag { indirectText = newText; return }
-            value = newText
+            return indirectValue
+        }, set: { newValue in
+            indirectValue = newValue
+            if !indirectEdit.flag { value = newValue }
         })
         
         HStack {
@@ -63,9 +65,16 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
                 }, label: { Text("Title") }).labelsHidden()
                     .focused($fieldFocus)
                     .onSubmit { toggleUnderEditing() }
+                    .modify {
+                        if #available(macOS 14, iOS 17, *) {
+                            $0.onKeyPress(.return , action: { Task { @MainActor in toggleUnderEditing()}; return .handled })
+                        } else {
+                            $0
+                        }
+                    }
                 if indirectEdit.flag {
                     Button(action: {
-                        indirectText = value
+                        indirectValue = value
                         underEditing.toggle()}, label: { indirectEdit.image })
                 }
             } else {
@@ -83,19 +92,17 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
             }
         }
         .onChange(of: fieldFocus) { _ in
-            if !fieldFocus { underEditing = false }
+            if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
         .onChange(of: value, perform: { _ in
-            indirectText = value
+            indirectValue = value
         })
     }
     
-    func toggleUnderEditing() {
-        if indirectEdit.flag == true,
-           underEditing == true {
-            value = indirectText
-        }
-        indirectText = value
+    func toggleUnderEditing(forceTo value: Bool? = nil) {
+        if let value = value,
+           underEditing == value { return }
+        if indirectEdit.flag { self.value = indirectValue }
         underEditing.toggle()
     }
 }

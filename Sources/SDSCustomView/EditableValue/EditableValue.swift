@@ -47,11 +47,10 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
     
     public var body: some View {
         let binding = Binding<V>(get: {
-            if indirectEdit.flag { return indirectValue }
-            return value
+            return indirectValue
         }, set: { newValue in
-            if indirectEdit.flag { indirectValue = newValue; return }
-            value = newValue
+            indirectValue = newValue
+            if !indirectEdit.flag { value = newValue }
         })
         
         HStack {
@@ -90,19 +89,17 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
             indirectValue = value
         })
         .onChange(of: fieldFocus) { _ in
-            if !fieldFocus { underEditing = false }
+            if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
         .onChange(of: textFocus) { _ in
             if textFocus { toggleUnderEditing() }
         }
     }
     
-    func toggleUnderEditing() {
-        if indirectEdit.flag == true,
-           underEditing == true {
-            value = indirectValue
-        }
-        indirectValue = value
+    func toggleUnderEditing(forceTo value: Bool? = nil) {
+        if let value = value,
+           underEditing == value { return }
+        if indirectEdit.flag { self.value = indirectValue }
         underEditing.toggle()
     }
     

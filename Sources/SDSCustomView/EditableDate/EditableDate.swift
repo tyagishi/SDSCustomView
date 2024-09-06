@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDSViewExtension
 
 private var undoIcon = Image(systemName: "arrow.uturn.backward")
 
@@ -13,12 +14,12 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
     @Environment(\.editableValueForgroundColorKey) var foregroundColor
     @Environment(\.editableTextIndirect) var indirectEdit
     @Environment(\.editableViewEditButtonLocation) var editButtonLocation
-    @Binding var date: Date
+    @Binding var value: Date
     let formatStyle: F
     let alignment: Alignment
     let displayComponents: DatePickerComponents
     @State private var underEditing: Bool {
-        didSet { if underEditing { fieldFocus = true } }
+        didSet { if underEditing { fieldFocus = true }; print("underEditing changed to \(underEditing)") }
     }
     @FocusState private var fieldFocus: Bool
     @FocusState private var textFocus: Bool
@@ -35,7 +36,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
                 editClick: Int = 1,
                 displayComponents: DatePickerComponents = [.hourAndMinute, .date],
                 alignment: Alignment = .leading) {
-        self._date = date
+        self._value = date
         self.formatStyle = format
         self.placeholder = placeholder
         self.editIcon = editIcon
@@ -49,11 +50,10 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
     
     public var body: some View {
         let binding = Binding<Date>(get: {
-            if indirectEdit.flag { return indirectValue }
-            return date
+            return indirectValue
         }, set: { newValue in
-            if indirectEdit.flag { indirectValue = newValue; return }
-            date = newValue
+            indirectValue = newValue
+            if !indirectEdit.flag { value = newValue }
         })
         
         HStack(spacing: 2) {
@@ -65,14 +65,20 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
                 DatePicker(selection: binding,
                            displayedComponents: displayComponents,
                            label: { Text("") })
-                    .focused($fieldFocus)
-                    .foregroundStyle(foregroundColor)
-                    .labelsHidden()
-                    .onSubmit { toggleUnderEditing() }
-                    .multilineTextAlignment(textAlignment(alignment))
+                .focused($fieldFocus)
+                .foregroundStyle(foregroundColor)
+                .labelsHidden()
+                .onSubmit { toggleUnderEditing() }
+                .multilineTextAlignment(textAlignment(alignment))
+                .modify {
+                    if #available(macOS 14, iOS 17, *) {
+                        $0.onKeyPress(.return , action: { Task { @MainActor in toggleUnderEditing()}; return .handled })
+                    } else {
+                        $0
+                    }
+                }
                 if indirectEdit.flag {
                     Button(action: {
-                        indirectValue = date
                         underEditing.toggle()}, label: { indirectEdit.image })
                 }
             } else {
@@ -92,22 +98,17 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
             }
         }
         .onChange(of: fieldFocus) { _ in
-            if !fieldFocus { toggleUnderEditing() }
+            if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
-        .onChange(of: textFocus) { _ in
-            if textFocus { toggleUnderEditing() }
-        }
-        .onChange(of: date, perform: { _ in
-            indirectValue = date
+        .onChange(of: value, perform: { _ in
+            indirectValue = value
         })
     }
     
-    func toggleUnderEditing() {
-        if indirectEdit.flag == true,
-           underEditing == true {
-            date = indirectValue
-        }
-        indirectValue = date
+    func toggleUnderEditing(forceTo value: Bool? = nil) {
+        if let value = value,
+           underEditing == value { return }
+        if indirectEdit.flag { self.value = indirectValue }
         underEditing.toggle()
     }
     

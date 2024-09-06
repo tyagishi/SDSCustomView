@@ -51,7 +51,7 @@ public struct EditableText: View {
     let editClick: Int
     let placeholder: String
     let editIcon: Image
-    @State private var indirectText: String
+    @State private var indirectValue: String
 
     @FocusState private var fieldFocus: Bool
     internal var didAppear: ((Self) -> Void)? // 1.
@@ -70,16 +70,15 @@ public struct EditableText: View {
 
         underEditing = (initMode == .edit)
         
-        indirectText = value.wrappedValue
+        indirectValue = value.wrappedValue
     }
     
     public var body: some View {
         let binding = Binding<String>(get: {
-            if indirectEdit.flag { return indirectText }
-            return value
-        }, set: { newText in
-            if indirectEdit.flag { indirectText = newText; return }
-            value = newText
+            return indirectValue
+        }, set: { newValue in
+            indirectValue = newValue
+            if !indirectEdit.flag { value = newValue }
         })
         
         HStack {
@@ -94,7 +93,7 @@ public struct EditableText: View {
                     .onSubmit { toggleUnderEditing() }
                 if indirectEdit.flag {
                     Button(action: {
-                        indirectText = value
+                        indirectValue = value
                         underEditing.toggle()}, label: { indirectEdit.image })
                 }
             } else {
@@ -113,20 +112,18 @@ public struct EditableText: View {
             }
         }
         .onChange(of: fieldFocus) { _ in
-            if !fieldFocus { underEditing = false }
+            if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
         .onChange(of: value, perform: { _ in
-            indirectText = value
+            indirectValue = value
         })
         .onAppear { self.didAppear?(self) } // 2.
     }
     
-    func toggleUnderEditing() {
-        if indirectEdit.flag == true,
-           underEditing == true {
-            value = indirectText
-        }
-        indirectText = value
+    func toggleUnderEditing(forceTo value: Bool? = nil) {
+        if let value = value,
+           underEditing == value { return }
+        if indirectEdit.flag { self.value = indirectValue }
         underEditing.toggle()
     }
 }

@@ -15,6 +15,10 @@ struct ContentView: View {
                 .tabItem({ Text("EditableText")})
             EditableValueExample()
                 .tabItem({ Text("EditableValue")})
+            EditableDateExample()
+                .tabItem({ Text("EditableDate")})
+            EditablePickerExample()
+                .tabItem({ Text("EditablePickerExample")})
         }
         .padding()
     }
@@ -32,7 +36,7 @@ struct EditableTextExample: View {
             EditableText(value: $text1, placeholder: "placeholder", editClick: 1, alignment: .leading)
                 .indirectEdit()
 
-            Text("text1 value: \(text1)")
+            Text("text1 value: \(text1)").focusable()
         }
 
     }
@@ -53,6 +57,54 @@ struct EditableValueExample: View {
         }
         .onChange(of: value, perform: { _ in
             print("value is changed")
+        })
+
+    }
+}
+
+struct EditableDateExample: View {
+    @State private var date = Date()
+    var body: some View {
+        VStack {
+            EditableDate(date: $date, displayComponents: [.date])
+            EditableDate(date: $date, displayComponents: [.date])
+                .indirectEdit()
+            EditableDate(date: $date, displayComponents: [.hourAndMinute])
+            EditableDate(date: $date, displayComponents: [.hourAndMinute])
+                .indirectEdit()
+            Text("value: \(date.formatted())")
+                .focusable()
+        }
+        .onChange(of: date, perform: { _ in
+            print("date is changed")
+        })
+
+    }
+}
+
+
+struct EditablePickerExample: View {
+    @State private var selection = "Hello"
+    var body: some View {
+        VStack {
+            EditablePicker(value: $selection, pickerContent: {
+                Text("Hello").tag("Hello")
+                Text("World").tag("World")
+                Text("Konnichiwa").tag("Konnichiwa")
+                Text("Sekai").tag("Sekai")
+            }, formatter: { $0 })
+            EditablePicker(value: $selection, pickerContent: {
+                Text("Hello").tag("Hello")
+                Text("World").tag("World")
+                Text("Konnichiwa").tag("Konnichiwa")
+                Text("Sekai").tag("Sekai")
+            }, formatter: { $0 })
+                .indirectEdit()
+            Text("value: \(selection)")
+                .focusable()
+        }
+        .onChange(of: selection, perform: { _ in
+            print("selection is changed")
         })
 
     }
