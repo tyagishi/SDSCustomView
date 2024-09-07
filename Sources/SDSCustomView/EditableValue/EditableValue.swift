@@ -162,7 +162,7 @@ extension View {
     public func indirectEdit(_ flag: Bool = true, cancelImage: Image = EditableText.undoIcon) -> some View {
         self.environment(\.editableTextIndirect, (flag, cancelImage))
     }
-    public func editValueForgroundColor(_ color: Color) -> some View {
+    public func editableValueForegroundColor(_ color: Color) -> some View {
         self.environment(\.editableValueForgroundColorKey, color)
     }
 }
