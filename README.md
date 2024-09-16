@@ -3,6 +3,25 @@
 convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
+## LazyView
+NagivationStack/TabView container load chid views at initial time.
+It might cause performance issue. if necessary wrap child view with LazyView, then child view initialization would be delayed.
+```swift
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            TabView(content: {
+                Tab(content: { LazyView(View1()) },
+                    label: { Label("View1", systemImage: "gear") })
+                Tab(content: { LazyView(View2()) },
+                    label: { Label("View2", systemImage: "gear") })
+            })
+        }
+        .padding()
+    }
+}
+```
+
 ## EditableText/EditableValue
 initially Text but it will become TextField with click.
 
