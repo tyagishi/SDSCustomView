@@ -18,7 +18,6 @@ public enum EditableMode {
     case editable, view, edit
 }
 
-
 /// EditableText: Text/TextField for string value
 /// value: string value for editing
 /// alignment: alignment for Text
