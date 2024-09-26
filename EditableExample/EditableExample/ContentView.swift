@@ -47,15 +47,17 @@ struct EditableValueExample: View {
     var body: some View {
         VStack {
             EditableValue(value: $value, format: IntegerFormatStyle.number)
-            EditableValue(value: $value, format: IntegerFormatStyle.number, initMode: .edit)
+            EditableValue(value: $value, format: IntegerFormatStyle.number)
 //                .indirectEdit()
             EditableValue(value: $value, format: IntegerFormatStyle.number)
+                .indirectEdit()
+            EditableValue(value: $value, format: IntegerFormatStyle.number, initMode: .edit)
                 .indirectEdit()
 
             Button(action: { value += 1}, label: { Text("+1") })
             Text("value: \(value)")
         }
-        .onChange(of: value, perform: { _ in
+        .onChange(of: value, {
             print("value is changed")
         })
 
@@ -75,7 +77,7 @@ struct EditableDateExample: View {
             Text("value: \(date.formatted())")
                 .focusable()
         }
-        .onChange(of: date, perform: { _ in
+        .onChange(of: date, {
             print("date is changed")
         })
 
@@ -103,7 +105,7 @@ struct EditablePickerExample: View {
             Text("value: \(selection)")
                 .focusable()
         }
-        .onChange(of: selection, perform: { _ in
+        .onChange(of: selection, {
             print("selection is changed")
         })
 

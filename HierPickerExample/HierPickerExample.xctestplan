@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "8AA2A3E9-E94F-49F7-9D0A-234ED5D83741",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:HierPickerExample.xcodeproj",
+      "identifier" : "364ADE882CA4FEF600816DD6",
+      "name" : "HierPickerExample"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:HierPickerExample.xcodeproj",
+        "identifier" : "364ADE992CA4FEF900816DD6",
+        "name" : "HierPickerExampleTests"
+      }
+    },
+    {
+      "enabled" : false,
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:HierPickerExample.xcodeproj",
+        "identifier" : "364ADEA32CA4FEF900816DD6",
+        "name" : "HierPickerExampleUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
