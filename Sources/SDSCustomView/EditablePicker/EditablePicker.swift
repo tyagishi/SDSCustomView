@@ -102,7 +102,8 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
     func toggleUnderEditing(forceTo value: Bool? = nil) {
         if let value = value,
            underEditing == value { return }
-        if indirectEdit.flag { self.value = indirectValue }
+        if indirectEdit.flag,
+           self.value != indirectValue { self.value = indirectValue }
         underEditing.toggle()
     }
 }
