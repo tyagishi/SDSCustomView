@@ -86,8 +86,8 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
                 Button(action: { toggleUnderEditing() }, label: { editIcon })
             }
         }
-        .onChange(of: value, perform: { _ in
-            indirectValue = value
+        .onChange(of: value, perform: { newValue in
+            indirectValue = newValue
         })
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
