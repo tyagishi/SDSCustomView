@@ -21,8 +21,6 @@ struct ContentView: View {
                 .tabItem({ Text("EditableDate")})
             EditablePickerExample()
                 .tabItem({ Text("EditablePickerExample")})
-            EditablePicker2Example()
-                .tabItem({ Text("EditablePicker2Example")})
         }
         .padding()
     }
@@ -164,35 +162,6 @@ struct EditablePickerExample: View {
         .onChange(of: selection, {
             print("selection is changed")
         })
-
-    }
-}
-
-extension String: Identifiable {
-    public var id: Self { return self }
-}
-
-struct EditablePicker2Example: View {
-    @State private var selection = "Hello"
-    @State private var dummy = "Hello world"
-    
-    @FocusState var focus: String?
-    
-    var body: some View {
-        VStack {
-            EditablePicker2(value: $selection, contentValues: ["Hello", "World", "Konnichiwa", "Sekai"], formatter: { $0 })
-            EditablePicker2(value: $selection, contentValues: ["Hello", "World", "Konnichiwa", "Sekai"], formatter: { $0 })
-                .indirectEdit()
-            Text("value: \(selection)")
-                .focusable()
-            TextField("DummyField", text: $dummy)
-        }
-        .onChange(of: selection, {
-            print("selection is changed")
-        })
-        .onChange(of: focus) { oldValue, newValue in
-            print("focus changed \(focus)")
-        }
 
     }
 }
