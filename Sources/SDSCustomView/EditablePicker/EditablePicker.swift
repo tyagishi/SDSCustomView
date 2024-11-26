@@ -63,6 +63,9 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
                 Picker(selection: binding, content: {
                     pickerContent
                 }, label: { Text("Title") }).labelsHidden()
+#if os(macOS)
+                    .focusable()
+#endif
                     .focused($fieldFocus)
                     .onSubmit { toggleUnderEditing() }
                     .modify {
