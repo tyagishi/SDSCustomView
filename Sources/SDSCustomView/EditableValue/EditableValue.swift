@@ -16,6 +16,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
     @Environment(\.editableViewEditButtonLocation) var editButtonLocation
     @Binding var value: V
     let formatStyle: F
+    let validate: ((V) -> Bool)?
     let editableMode: EditableMode
     let alignment: Alignment
     @State private var underEditing: Bool {
@@ -30,11 +31,13 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
 
     public init(value: Binding<V>,
                 format: F,
+                validate: ((V) -> Bool)? = nil, // false then ignore input
                 initMode: EditableMode = .editable,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
                 editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
+        self.validate = validate
         self.formatStyle = format
         self.editableMode = initMode
         self.placeholder = placeholder
@@ -50,6 +53,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
         let binding = Binding<V>(get: {
             return indirectValue
         }, set: { newValue in
+            if validate?(newValue) == false { return }
             indirectValue = newValue
             if !indirectEdit.flag { value = newValue }
         })
