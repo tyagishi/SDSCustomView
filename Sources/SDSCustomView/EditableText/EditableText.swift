@@ -50,6 +50,7 @@ public struct EditableText: View {
     let editClick: Int
     let placeholder: String
     let editIcon: Image
+    let doneIcon: Image
     @State private var indirectValue: String
 
     @FocusState private var fieldFocus: Bool
@@ -59,11 +60,13 @@ public struct EditableText: View {
                 initMode: EditableMode = .editable,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
+                doneIcon: Image = Image(systemName: "return"),
                 editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
         self.editableMode = initMode
         self.placeholder = placeholder
         self.editIcon = editIcon
+        self.doneIcon = doneIcon
         self.alignment = alignment
         self.editClick = editClick
 
@@ -83,7 +86,7 @@ public struct EditableText: View {
         HStack {
             if editButtonLocation == .leading,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { icon })
             }
             if underEditing {
                 TextField(placeholder,
@@ -107,7 +110,7 @@ public struct EditableText: View {
             }
             if editButtonLocation == .trailing,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { icon })
             }
         }
         .onChange(of: fieldFocus) { _ in
@@ -117,6 +120,11 @@ public struct EditableText: View {
             indirectValue = value
         })
         .onAppear { self.didAppear?(self) } // 2.
+    }
+    
+    var icon: Image {
+        if underEditing { return doneIcon }
+        return editIcon
     }
     
     func toggleUnderEditing(forceTo value: Bool? = nil) {

@@ -23,6 +23,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
     let pickerContent: Content
     let formatter: (Selection) -> String
     let editIcon: Image
+    let doneIcon: Image
     @State private var indirectValue: Selection
 
     @FocusState private var fieldFocus: Bool
@@ -33,12 +34,14 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
                 @ViewBuilder pickerContent: @escaping (() -> Content),
                 formatter: @escaping ((Selection) -> String),
                 editIcon: Image = Image(systemName: "pencil"),
+                doneIcon: Image = Image(systemName: "return"),
                 editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
         self.placeholder = placeholder
         self.pickerContent = pickerContent()
         self.formatter = formatter
         self.editIcon = editIcon
+        self.doneIcon = doneIcon
         self.alignment = alignment
         self.editClick = editClick
         
@@ -57,7 +60,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
         HStack {
             if editButtonLocation == .leading,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { icon })
             }
             if underEditing {
                 Picker(selection: binding, content: {
@@ -91,7 +94,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
             }
             if editButtonLocation == .trailing,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { icon })
             }
         }
         .onChange(of: fieldFocus) { _ in
@@ -100,6 +103,11 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
         .onChange(of: value, perform: { _ in
             indirectValue = value
         })
+    }
+    
+    var icon: Image {
+        if underEditing { return doneIcon }
+        return editIcon
     }
     
     func toggleUnderEditing(forceTo value: Bool? = nil) {

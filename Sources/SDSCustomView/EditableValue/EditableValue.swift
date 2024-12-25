@@ -27,6 +27,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
     let editClick: Int
     let placeholder: String
     let editIcon: Image
+    let doneIcon: Image
     @State private var indirectValue: V
 
     public init(value: Binding<V>,
@@ -35,6 +36,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
                 initMode: EditableMode = .editable,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
+                doneIcon: Image = Image(systemName: "return"),
                 editClick: Int = 1, alignment: Alignment = .leading) {
         self._value = value
         self.validate = validate
@@ -42,6 +44,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
         self.editableMode = initMode
         self.placeholder = placeholder
         self.editIcon = editIcon
+        self.doneIcon = doneIcon
         self.alignment = alignment
         self.editClick = editClick
         
@@ -61,7 +64,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
         HStack {
             if editButtonLocation == .leading,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { icon })
             }
             if underEditing {
                 TextField(placeholder, value: binding, format: formatStyle)
@@ -87,7 +90,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
             }
             if editButtonLocation == .trailing,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { icon })
             }
         }
         .onChange(of: value, perform: { newValue in
@@ -99,6 +102,11 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
         .onChange(of: textFocus) { _ in
             if textFocus { toggleUnderEditing() }
         }
+    }
+    
+    var icon: Image {
+        if underEditing { return doneIcon }
+        return editIcon
     }
     
     func toggleUnderEditing(forceTo value: Bool? = nil) {

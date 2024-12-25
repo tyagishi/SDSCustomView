@@ -26,6 +26,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
     let editClick: Int
     let placeholder: String
     let editIcon: Image
+    let doneIcon: Image
     @State private var indirectValue: Date
 
     public init(date: Binding<Date>,
@@ -33,6 +34,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
                 initMode: EditableMode = .editable,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),
+                doneIcon: Image = Image(systemName: "return"),
                 editClick: Int = 1,
                 displayComponents: DatePickerComponents = [.hourAndMinute, .date],
                 alignment: Alignment = .leading) {
@@ -40,6 +42,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         self.formatStyle = format
         self.placeholder = placeholder
         self.editIcon = editIcon
+        self.doneIcon = doneIcon
         self.alignment = alignment
         self.displayComponents = displayComponents
         self.editClick = editClick
@@ -59,7 +62,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         HStack(spacing: 2) {
             if editButtonLocation == .leading,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { icon })
             }
             if underEditing {
                 DatePicker(selection: binding,
@@ -94,7 +97,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
             }
             if editButtonLocation == .trailing,
                editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+                Button(action: { toggleUnderEditing() }, label: { icon })
             }
         }
         .onChange(of: fieldFocus) { _ in
@@ -103,6 +106,11 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         .onChange(of: value, perform: { _ in
             indirectValue = value
         })
+    }
+    
+    var icon: Image {
+        if underEditing { return doneIcon }
+        return editIcon
     }
     
     func toggleUnderEditing(forceTo value: Bool? = nil) {
