@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDSViewExtension
 
 private var undoIcon = Image(systemName: "arrow.uturn.backward")
 
@@ -29,6 +30,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
     let editIcon: Image
     let doneIcon: Image
     @State private var indirectValue: V
+    @State private var isValidValue = true
 
     public init(value: Binding<V>,
                 format: F,
@@ -56,7 +58,8 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
         let binding = Binding<V>(get: {
             return indirectValue
         }, set: { newValue in
-            if validate?(newValue) == false { return }
+            if validate?(newValue) == false { isValidValue = false; return }
+            isValidValue = true
             indirectValue = newValue
             if !indirectEdit.flag { value = newValue }
         })
@@ -72,6 +75,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
                     .foregroundStyle(foregroundColor)
                     .onSubmit { toggleUnderEditing() }
                     .multilineTextAlignment(textAlignment(alignment))
+                    .border(isValidValue ? .clear : .red)
                 if indirectEdit.flag {
                     Button(action: {
                         indirectValue = value
