@@ -133,4 +133,3 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
 #Preview {
     EditableText(value: .constant("Hello world"))
 }
-

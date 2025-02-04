@@ -3,6 +3,47 @@
 convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
+## RectangleSelector
+View for selecting rectangle area
+```swift
+import SwiftUI
+import SDSCustomView
+
+struct ContentView: View {
+    @State private var selectedRect: CGRect = .zero
+    @State private var state: SelectionStatus = .selection
+
+    var body: some View {
+        VStack {
+            Image("Photo").resizable().scaledToFit()
+                .overlay {
+                    RectangleSelector(state: $state, rect: $selectedRect).zIndex(1.0)
+                }
+                .onChange(of: selectedRect, {
+                    print("new rect: \(selectedRect)")
+                })
+                .overlay {
+                    if state == .done,
+                       selectedRect.size != .zero {
+                        RectShape(rect: selectedRect).stroke(lineWidth: 3).foregroundStyle(.orange)
+                    }
+                }
+            HStack {
+                Text("Current State: \(state.description)")
+                Spacer()
+                Button(action: {
+                    state = .selection
+                    selectedRect = .zero
+                }, label: { Text("Re-Active") })
+                Button(action: {
+                    state = .resize
+                }, label: { Text("Adjust") })
+            }
+        }
+        .padding()
+    }
+}
+```
 ## LazyView
 NagivationStack/TabView container load chid views at initial time.
 It might cause performance issue. if necessary wrap child view with LazyView, then child view initialization would be delayed.

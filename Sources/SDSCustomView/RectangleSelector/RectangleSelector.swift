@@ -98,7 +98,7 @@ public struct RectangleSelector: View {
                         guard startLoc != .zero else { startLoc = value.startLocation; workingRect.size = .zero; return }
                         dragLoc = value.location
                     })
-                        .onEnded({ value in
+                        .onEnded({ _ in
                             let finalRect = CGRect(point1: startLoc, point2: dragLoc)
                             workingRect = finalRect
                             startLoc = .zero
