@@ -11,31 +11,39 @@ import SwiftUI
 public struct TextDotsStyle: ProgressViewStyle {
     let unitText: String
     let completeNum: Int
-    @State private var showNum: Int = 1
+    let updateFrequency: CGFloat
+    @State private var showNum: Int = 0
 
-    public init(unitText: String = ".",completeNum: Int = 5) {
+    public init(unitText: String,completeNum: Int, updateFrequency: CGFloat) {
         self.unitText = unitText
         self.completeNum = completeNum
+        self.updateFrequency = updateFrequency
     }
 
     public func makeBody(configuration: Configuration) -> some View {
         Text(Array(repeating: unitText, count: completeNum).joined())
             .hidden()
-            .overlay(content: {
+            .overlay(alignment: .leading, content: {
                 let showNum = localCompNum(configuration: configuration)
                 Text(Array(repeating: unitText, count: showNum).joined())
-                .frame(maxWidth: .infinity, alignment: .leading)
             })
-            .onReceive(Timer.TimerPublisher(interval: 1.0, runLoop: .main, mode: .default).autoconnect(), perform: { _ in
+            .onReceive(Timer.TimerPublisher(interval: updateFrequency, runLoop: .main, mode: .default).autoconnect(), perform: { _ in
                 guard configuration.fractionCompleted == nil else { return }
-                self.showNum = (showNum + 1) % (completeNum+1)
+                showNum += 1
+                showNum %= (completeNum+1)
             })
     }
     
     func localCompNum(configuration: Configuration) -> Int {
         if let ratio = configuration.fractionCompleted {
-            return max(Int(Double(completeNum) * ratio), 0)
+            return Int(Double(completeNum) * ratio)
         }
         return showNum
+    }
+}
+
+extension ProgressViewStyle where Self == TextDotsStyle {
+    public static func textDots(unitText: String = ".", completeNum: Int = 5, updateFrequency: CGFloat = 0.5) -> Self {
+        return .init(unitText: unitText, completeNum: completeNum, updateFrequency: updateFrequency)
     }
 }
