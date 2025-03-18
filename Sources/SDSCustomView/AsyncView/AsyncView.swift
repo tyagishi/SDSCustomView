@@ -9,6 +9,7 @@ import Combine
 import SwiftUI
 import SDSViewExtension
 
+@available(iOS 15, macOS 12, *)
 public struct AsyncView<T: Sendable, PV: View, DV: View>: View {
     let content: (T) -> DV
     let placeholder: PV

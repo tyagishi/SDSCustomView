@@ -36,6 +36,7 @@ public enum EditableMode {
 ///         view: only Text appear
 ///         edit: only TextField appear
 ///         editable: Text/TextField will be toggled
+@available(iOS 15, macOS 12, *)
 public struct EditableText: View {
     public static var undoIcon = Image(systemName: "arrow.uturn.backward")
     
@@ -135,17 +136,16 @@ public struct EditableText: View {
         underEditing.toggle()
     }
 }
-#Preview {
-    EditableText(value: .constant("Hello world"))
-}
 
 // MARK: indirectEdit ViewModifier
+@available(iOS 15, macOS 12, *)
 struct EditableTextIndirectKey: EnvironmentKey {
     typealias Value = (Bool, Image)
     
     static var defaultValue: (Bool, Image) = (false, EditableText.undoIcon)
 }
 
+@available(iOS 15, macOS 12, *)
 extension EnvironmentValues {
     public var editableTextIndirect: (flag: Bool, image: Image) {
         get { return self[EditableTextIndirectKey.self] }
@@ -153,6 +153,7 @@ extension EnvironmentValues {
     }
 }
 
+@available(iOS 15, macOS 12, *)
 extension EditableText {
     public func indirectEdit(_ flag: Bool = true, cancelImage: Image = EditableText.undoIcon) -> some View {
         self.environment(\.editableTextIndirect, (flag, cancelImage))

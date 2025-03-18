@@ -38,11 +38,13 @@ extension EnvironmentValues {
 }
 
 // MARK: indirectEdit ViewModifier
+@available(iOS 15, macOS 12, *)
 public struct EditableValueIndirectKey: EnvironmentKey {
     public typealias Value = (Bool, Image)
     public static var defaultValue: (Bool, Image) = (false, EditableText.undoIcon)
 }
 
+@available(iOS 15, macOS 12, *)
 extension EnvironmentValues {
     public var editableValueIndirect: (flag: Bool, image: Image) {
         get { return self[EditableValueIndirectKey.self] }
@@ -50,6 +52,7 @@ extension EnvironmentValues {
     }
 }
 
+@available(iOS 15, macOS 12, *)
 extension View {
     public func indirectEdit(_ flag: Bool = true, cancelImage: Image = EditableText.undoIcon) -> some View {
         self.environment(\.editableTextIndirect, (flag, cancelImage))

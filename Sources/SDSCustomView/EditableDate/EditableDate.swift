@@ -10,6 +10,7 @@ import SDSViewExtension
 
 private var undoIcon = Image(systemName: "arrow.uturn.backward")
 
+@available(iOS 15, macOS 12, *)
 public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput == Date, F.FormatOutput == String {
     @Environment(\.editableValueForgroundColorKey) var foregroundColor
     @Environment(\.editableTextIndirect) var indirectEdit
@@ -129,12 +130,4 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         default:         return TextAlignment.leading
         }
     }
-}
-#Preview {
-    EditableDate(date: .constant(Date()))
-        .indirectEdit()
-        .fixedSize()
-        .frame(width: 800, alignment: .leading)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .border(.green)
 }

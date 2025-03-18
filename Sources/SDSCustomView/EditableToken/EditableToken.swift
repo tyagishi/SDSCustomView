@@ -12,6 +12,7 @@ import SwiftUI
 // swiftlint:disable:next identifier_name
 let editableTokenFocusLooseRequestNotification = Notification.Name("EditableTokenFocusLooseRequestNotification")
 
+@available(iOS 15, macOS 12, *)
 public struct EditableToken: View {
     public static var undoIcon = Image(systemName: "arrow.uturn.backward")
     @Environment(\.editableViewEditButtonLocation) var editButtonLocation

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 15, macOS 12, *)
 public struct TokenView: View {
     let tokens: [String]
     

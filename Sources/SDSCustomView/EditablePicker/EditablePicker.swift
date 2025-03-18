@@ -8,6 +8,7 @@
 import SwiftUI
 import SDSViewExtension
 
+@available(iOS 15, macOS 12, *)
 public struct EditablePicker<Content: View, Selection: Hashable>: View {
     var undoIcon = Image(systemName: "arrow.uturn.backward")
     

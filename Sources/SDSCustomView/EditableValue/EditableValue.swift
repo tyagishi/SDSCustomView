@@ -10,6 +10,7 @@ import SDSViewExtension
 
 private var undoIcon = Image(systemName: "arrow.uturn.backward")
 
+@available(iOS 15, macOS 12, *)
 public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F.FormatInput == V, F.FormatOutput == String {
     typealias Value = V
     @Environment(\.editableValueForgroundColorKey) var foregroundColor
@@ -129,7 +130,4 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
         default:         return TextAlignment.leading
         }
     }
-}
-#Preview {
-    EditableText(value: .constant("Hello world"))
 }

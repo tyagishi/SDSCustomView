@@ -135,6 +135,7 @@ public struct RectangleSelector: View {
     }
 }
 
+@available(iOS 15, macOS 12, *)
 struct GrabEdge: View {
     @Binding var rect: CGRect
     let edge: RectangleEdge

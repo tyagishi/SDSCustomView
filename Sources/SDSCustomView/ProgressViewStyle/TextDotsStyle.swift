@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@available(iOS 15, macOS 12, *)
 public struct TextDotsStyle: ProgressViewStyle {
     let unitText: String
     let completeNum: Int
@@ -42,6 +43,7 @@ public struct TextDotsStyle: ProgressViewStyle {
     }
 }
 
+@available(iOS 15, macOS 12, *)
 extension ProgressViewStyle where Self == TextDotsStyle {
     public static func textDots(unitText: String = ".", completeNum: Int = 5, updateFrequency: CGFloat = 0.5) -> Self {
         return .init(unitText: unitText, completeNum: completeNum, updateFrequency: updateFrequency)
