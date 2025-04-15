@@ -19,6 +19,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/tyagishi/SDSCGExtension", from: "1.3.5"),
+        .package(url: "https://github.com/tyagishi/SDSFoundationExtension", from: "1.3.2"),
         .package(url: "https://github.com/tyagishi/SDSViewExtension", from: "4.2.0"),
         .package(url: "https://github.com/tyagishi/SDSDataStructure", from: "4.0.0"),
         .package(url: "https://github.com/tyagishi/SDSMacros", from: "2.0.0"),
@@ -30,7 +31,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "SDSCustomView",
-            dependencies: ["SDSCGExtension", "SDSViewExtension", "SDSDataStructure"],
+            dependencies: ["SDSCGExtension", "SDSFoundationExtension", "SDSViewExtension", "SDSDataStructure"],
             plugins: [
                 .plugin(name: "SDSMacros", package: "SDSMacros"),
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
