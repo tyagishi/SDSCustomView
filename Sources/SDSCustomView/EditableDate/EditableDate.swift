@@ -104,9 +104,6 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
-        .onChange(of: value, perform: { _ in
-            indirectValue = value
-        })
     }
     
     var icon: Image {
