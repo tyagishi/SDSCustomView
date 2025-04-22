@@ -117,9 +117,6 @@ public struct EditableText: View {
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
-        .onChange(of: value, perform: { _ in
-            indirectValue = value
-        })
         .onAppear { self.didAppear?(self) } // 2.
     }
     

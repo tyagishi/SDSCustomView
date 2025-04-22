@@ -101,9 +101,6 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
-        .onChange(of: value, perform: { _ in
-            indirectValue = value
-        })
     }
     
     var icon: Image {
