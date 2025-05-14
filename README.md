@@ -3,6 +3,22 @@
 convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
+## TextDotsStyle/ProgressViewStyle
+showing ... as progress bar
+```swift
+import SwiftUI
+import SDSCustomView
+
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            Text("ProgressView textDots proto")
+            ProgressView()
+                .progressViewStyle(TextDotsStyle(unitText: ".", completeNum: 9, updateFrequency: 0.25))
+                .font(.largeTitle)
+        }
+```
+
 ## RectangleSelector
 View for selecting rectangle area
 ```swift
