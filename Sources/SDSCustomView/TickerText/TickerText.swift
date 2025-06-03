@@ -15,6 +15,7 @@ struct ViewSizePreferenceKey: PreferenceKey {
     }
 }
 
+@available(iOS 15, macOS 12, *)
 public struct TickerText: View {
     @State private var offsetValue: CGFloat = 0
     @State private var textWidth: CGFloat = 10
