@@ -3,6 +3,33 @@
 convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
+## TextFieldWithSuggestions
+TextField which can 
+- suggest with current string in TextField
+- can select with mouse-click/ cursor+return
+- customizable: suggestion words, timing, merge policy 
+```swift
+import SwiftUI
+import SDSCustomView
+
+struct ContentView: View {
+    @State private var displayText = "Hello"
+
+    var body: some View {
+        VStack {
+            TextFieldWithSuggestions($displayText, suggestions: { _ in
+                return ["abc", "def", "ghi"]
+            }, trigger: { text in text.hasSuffix("a")
+            }, handler: { (current, selected) in
+                return current.dropLast() + selected + ", "
+            })
+            Spacer()
+        }
+        .padding()
+    }
+}
+```
+
 ## TextDotsStyle/ProgressViewStyle
 showing ... as progress bar
 ```swift
