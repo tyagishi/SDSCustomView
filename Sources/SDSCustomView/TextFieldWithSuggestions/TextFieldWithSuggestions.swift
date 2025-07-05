@@ -42,8 +42,8 @@ public struct TextFieldWithSuggestions: View {
     @State private var currentTextWidth: CGFloat = 0
 
     public init(_ text: Binding<String>, suggestions: @escaping (String) -> [String],
-         trigger: @escaping (String) -> Bool,
-         handler: @escaping (String, String) -> String) {
+                trigger: @escaping (String) -> Bool,
+                handler: @escaping (String, String) -> String) {
         self._displayText = text
         self.suggestions = suggestions
         self.trigger = trigger
