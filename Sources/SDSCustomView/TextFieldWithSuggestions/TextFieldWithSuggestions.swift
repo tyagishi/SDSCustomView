@@ -63,10 +63,9 @@ public struct TextFieldWithSuggestions: View {
                 }
             })
             .background {
-                Text(displayText) // retrieve text width
-                    .readGeom(onChange: { proxy in
-                        currentTextWidth = proxy.size.width
-                    }).hidden()
+                // retrieve text width
+                Text(displayText).hidden()
+                    .readGeom(onChange: { proxy in currentTextWidth = proxy.size.width })
             }
             .overlay {
                 if showComplementList {
