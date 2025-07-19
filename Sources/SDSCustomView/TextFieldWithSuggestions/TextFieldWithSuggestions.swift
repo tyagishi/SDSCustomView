@@ -67,7 +67,7 @@ public struct TextFieldWithSuggestions: View {
                 Text(displayText).hidden()
                     .readGeom(onChange: { proxy in currentTextWidth = proxy.size.width })
             }
-            .overlay {
+            .overlay(content: {
                 if showComplementList {
                     let suggestionItems = suggestions(displayText)
                     HStack {
@@ -115,7 +115,8 @@ public struct TextFieldWithSuggestions: View {
                     })
                     .offset(x: currentTextWidth, y: 24) // TODO: may need to adjust 24
                 }
-            }
+            })
+            .border(.red)
     }
     enum KeyFunction {
         case leftArrow, rightArrow, `return`, escape
