@@ -11,6 +11,30 @@ import SDSViewExtension
 
 @IsCheckEnum
 @AssociatedValueEnum
+public enum TextFieldWithSuggestionsViewAdjustment {
+    case none
+    case endOfText
+    case specify(CGFloat)
+}
+
+public struct TextFieldWithSuggestionsViewAdjustmentKey: EnvironmentKey {
+    public typealias Value = TextFieldWithSuggestionsViewAdjustment
+    public static let defaultValue = TextFieldWithSuggestionsViewAdjustment.endOfText
+}
+extension EnvironmentValues {
+    public var textFieldWithSuggestionsViewAdjustment: TextFieldWithSuggestionsViewAdjustment {
+        get { return self[TextFieldWithSuggestionsViewAdjustmentKey.self] }
+        set { self[TextFieldWithSuggestionsViewAdjustmentKey.self] = newValue }
+    }
+}
+extension View {
+    public func suggestionsViewAdjustment(_ alignment: TextFieldWithSuggestionsViewAdjustment = .endOfText) -> some View {
+        self.environment(\.textFieldWithSuggestionsViewAdjustment, alignment)
+    }
+}
+
+@IsCheckEnum
+@AssociatedValueEnum
 enum FocusElement: Hashable {
     case textField
     case complement(Int)
@@ -29,6 +53,7 @@ enum FocusElement: Hashable {
 
 @available(iOS 18, macOS 15, *)
 public struct TextFieldWithSuggestions: View {
+    @Environment(\.textFieldWithSuggestionsViewAdjustment) var viewAdjustment
     @Binding var displayText: String
     let suggestions: (String) -> [String]
     let trigger: (String) -> Bool
@@ -142,7 +167,15 @@ public struct TextFieldWithSuggestions: View {
         })
         .background(.white.opacity(0.7))
         .frame(width: (textFieldWidth - currentTextWidth) * 0.7) // 少し短めで
-        .offset(x: currentTextWidth, y: 24) // TODO: may need to adjust 24
+        .offset(x: offsetX(currentTextWidth), y: 24) // TODO: may need to adjust 24
+    }
+    
+    func offsetX(_ currentTextWidth: CGFloat) -> CGFloat {
+        switch viewAdjustment {
+        case .none:                return 0
+        case .endOfText:           return currentTextWidth
+        case .specify(let offset): return offset
+        }
     }
     
     enum KeyFunction {
