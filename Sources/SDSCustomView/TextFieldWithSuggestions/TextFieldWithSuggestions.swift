@@ -16,20 +16,38 @@ public enum TextFieldWithSuggestionsViewAdjustment {
     case endOfText
     case specify(CGFloat)
 }
-
 public struct TextFieldWithSuggestionsViewAdjustmentKey: EnvironmentKey {
     public typealias Value = TextFieldWithSuggestionsViewAdjustment
     public static let defaultValue = TextFieldWithSuggestionsViewAdjustment.endOfText
+}
+
+@IsCheckEnum
+@AssociatedValueEnum
+public enum TextFieldWithSuggestionsViewWidth {
+    case tillEndOfField
+    case ratio(CGFloat)
+}
+
+public struct TextFieldWithSuggestionsViewWidthKey: EnvironmentKey {
+    public typealias Value = TextFieldWithSuggestionsViewWidth
+    public static let defaultValue = TextFieldWithSuggestionsViewWidth.tillEndOfField
 }
 extension EnvironmentValues {
     public var textFieldWithSuggestionsViewAdjustment: TextFieldWithSuggestionsViewAdjustment {
         get { return self[TextFieldWithSuggestionsViewAdjustmentKey.self] }
         set { self[TextFieldWithSuggestionsViewAdjustmentKey.self] = newValue }
     }
+    public var textFieldWithSuggestionsViewWidth: TextFieldWithSuggestionsViewWidth {
+        get { return self[TextFieldWithSuggestionsViewWidthKey.self] }
+        set { self[TextFieldWithSuggestionsViewWidthKey.self] = newValue }
+    }
 }
 extension View {
     public func suggestionsViewAdjustment(_ alignment: TextFieldWithSuggestionsViewAdjustment = .endOfText) -> some View {
         self.environment(\.textFieldWithSuggestionsViewAdjustment, alignment)
+    }
+    public func suggestionsViewWidth(_ alignment: TextFieldWithSuggestionsViewWidth = .tillEndOfField) -> some View {
+        self.environment(\.textFieldWithSuggestionsViewWidth, alignment)
     }
 }
 
@@ -54,6 +72,7 @@ enum FocusElement: Hashable {
 @available(iOS 18, macOS 15, *)
 public struct TextFieldWithSuggestions: View {
     @Environment(\.textFieldWithSuggestionsViewAdjustment) var viewAdjustment
+    @Environment(\.textFieldWithSuggestionsViewWidth) var viewWidth
     @Binding var displayText: String
     let suggestions: (String) -> [String]
     let trigger: (String) -> Bool
@@ -166,8 +185,16 @@ public struct TextFieldWithSuggestions: View {
             })
         })
         .background(.white.opacity(0.7))
-        .frame(width: (textFieldWidth - currentTextWidth) * 0.7) // 少し短めで
+        .frame(width: width(textFieldWidth, currentTextWidth: currentTextWidth))
         .offset(x: offsetX(currentTextWidth), y: 24) // TODO: may need to adjust 24
+    }
+    
+    func width(_ textFieldWidth: CGFloat, currentTextWidth: CGFloat) -> CGFloat {
+        let baseWidth = textFieldWidth - offsetX(currentTextWidth)
+        switch viewWidth {
+        case .tillEndOfField:     return baseWidth
+        case .ratio(let ratio):   return baseWidth * ratio 
+        }
     }
     
     func offsetX(_ currentTextWidth: CGFloat) -> CGFloat {
