@@ -64,6 +64,12 @@ public struct TextFieldWithSuggestions: View {
                         showComplementList = false
                     }
                 })
+                .onKeyPress(.downArrow, action: {
+                    guard !suggestions(displayText).isEmpty else { return .ignored }
+                    focus = .complement(0)
+                    showComplementList = true
+                    return .handled
+                })
                 .readGeom(onChange: { proxy in textFieldWidth = proxy.size.width })
                 .background {
                     // retrieve text width
