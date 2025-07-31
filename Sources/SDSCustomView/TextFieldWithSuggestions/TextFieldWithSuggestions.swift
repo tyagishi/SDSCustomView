@@ -64,9 +64,7 @@ public struct TextFieldWithSuggestions: View {
                         showComplementList = false
                     }
                 })
-                .readGeom(onChange: { proxy in
-                    print("textFieldWidth: \(textFieldWidth)")
-                    textFieldWidth = proxy.size.width })
+                .readGeom(onChange: { proxy in textFieldWidth = proxy.size.width })
                 .background {
                     // retrieve text width
                     Text(displayText).hidden()
@@ -74,84 +72,73 @@ public struct TextFieldWithSuggestions: View {
                 }
                 .overlay(alignment: .leading, content: {
                     if showComplementList {
-                        let suggestionItems = suggestions(displayText)
-                        ScrollViewReader(content: { scrollProxy in
-                            ScrollView(.horizontal, content: {
-                                HStack {
-                                    ForEach(suggestionItems.enumerated(), id: \.0, content: { (index, title) in
-                                        Button(action: {
-                                            complementText = title
-                                        }, label: { Text(title) }).id(title)
-                                        .focused($focus, equals: .complement(index))
-                                    })
-                                    Spacer()
-                                }
-                                .onKeyPress(action: { key in
-                                    switch keyFunction(key) {
-                                    case nil:      return .ignored
-                                    case .rightArrow:
-                                        guard let focus = focus else { return .ignored }
-                                        self.focus = focus.nextComplement(in: suggestionItems.count)
-                                    case .leftArrow:
-                                        guard let focus = focus else { return .ignored }
-                                        self.focus = focus.prevComplement(in: suggestionItems.count)
-                                    case .return:
-                                        guard let selection = focus?.complementValues else { return .ignored }
-                                        complementText = suggestionItems[selection]
-                                    case .escape:
-                                        self.focus = .textField
-                                    }
-                                    return .handled
-                                })
-                                .onChange(of: complementText, {
-                                    guard !complementText.isEmpty else { return }
-                                    displayText = handler(displayText, complementText)
-                                    self.complementText = ""
-                                    // note: can not combine following two request into one...
-                                    DispatchQueue.main.asyncAfter(deadline: .now()+0.001, execute: {
-                                        focus = .textField
-                                    })
-                                    DispatchQueue.main.asyncAfter(deadline: .now()+0.01, execute: {
-                                        selection = .init(insertionPoint: displayText.endIndex)
-                                    })
-                                })
-                                .onChange(of: focus, {
-                                    // note: if complement list loose focus, should disappear
-                                    guard let focus = focus else { return }
-                                    if !focus.isComplement { showComplementList = false }
-                                })
-                                .onChange(of: focus, {
-                                    // scroll to focused element
-                                    print("try to scroll")
-                                    guard let focusIndex = focus?.complementValues else { return }
-                                    let itemID = suggestionItems[focusIndex]
-                                    scrollProxy.scrollTo(itemID)
-                                    print("scrolled to \(itemID)")
-                                })
-                            })
-                        })
-                        .background(.white.opacity(0.7))
-                        .frame(width: (textFieldWidth - currentTextWidth) * 0.7)
-                        .offset(x: currentTextWidth, y: 24) // TODO: may need to adjust 24
+                        suggestionView
                     }
                 })
-//            Spacer()
-//            if showComplementList {
-//                let suggestionItems = suggestions(displayText)
-//                ScrollView(.horizontal, content: {
-//                    HStack {
-//                        ForEach(suggestionItems.enumerated(), id: \.0, content: { (index, title) in
-//                            Button(action: {
-//                                complementText = title
-//                            }, label: { Text(title) })
-//                            .focused($focus, equals: .complement(index))
-//                        })
-//                        Spacer()
-//                    }
-//                })
-//            }
         })
     }
+    
+    @ViewBuilder
+    var suggestionView: some View {
+        let suggestionItems = Array(suggestions(displayText).enumerated())
+        ScrollViewReader(content: { scrollProxy in
+            ScrollView(.horizontal, content: {
+                HStack {
+                    ForEach(suggestionItems, id: \.0, content: { (index, title) in
+                        Button(action: {
+                            complementText = title
+                        }, label: { Text(title) }).id(title)
+                        .focused($focus, equals: .complement(index))
+                    })
+                    Spacer()
+                }
+                .onKeyPress(action: { key in
+                    switch keyFunction(key) {
+                    case nil:      return .ignored
+                    case .rightArrow:
+                        guard let focus = focus else { return .ignored }
+                        self.focus = focus.nextComplement(in: suggestionItems.count)
+                    case .leftArrow:
+                        guard let focus = focus else { return .ignored }
+                        self.focus = focus.prevComplement(in: suggestionItems.count)
+                    case .return:
+                        guard let selection = focus?.complementValues else { return .ignored }
+                        complementText = suggestionItems[selection].1
+                    case .escape:
+                        self.focus = .textField
+                    }
+                    return .handled
+                })
+                .onChange(of: complementText, {
+                    guard !complementText.isEmpty else { return }
+                    displayText = handler(displayText, complementText)
+                    self.complementText = ""
+                    // note: can not combine following two request into one...
+                    DispatchQueue.main.asyncAfter(deadline: .now()+0.001, execute: {
+                        focus = .textField
+                    })
+                    DispatchQueue.main.asyncAfter(deadline: .now()+0.01, execute: {
+                        selection = .init(insertionPoint: displayText.endIndex)
+                    })
+                })
+                .onChange(of: focus, {
+                    // note: if complement list loose focus, should disappear
+                    guard let focus = focus else { return }
+                    if !focus.isComplement { showComplementList = false }
+                })
+                .onChange(of: focus, {
+                    // scroll to focused element
+                    guard let focusIndex = focus?.complementValues else { return }
+                    let itemID = suggestionItems[focusIndex].1
+                    scrollProxy.scrollTo(itemID)
+                })
+            })
+        })
+        .background(.white.opacity(0.7))
+        .frame(width: (textFieldWidth - currentTextWidth) * 0.7) // 少し短めで
+        .offset(x: currentTextWidth, y: 24) // TODO: may need to adjust 24
+    }
+    
     enum KeyFunction {
         case leftArrow, rightArrow, `return`, escape
     }
