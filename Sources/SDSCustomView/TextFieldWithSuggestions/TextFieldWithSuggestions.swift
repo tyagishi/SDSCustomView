@@ -40,6 +40,7 @@ public struct TextFieldWithSuggestions: View {
     @State private var complementText: String = ""
     
     @State private var currentTextWidth: CGFloat = 0
+    @State private var textFieldWidth: CGFloat = 0
 
     public init(_ text: Binding<String>, suggestions: @escaping (String) -> [String],
                 trigger: @escaping (String) -> Bool,
@@ -51,72 +52,105 @@ public struct TextFieldWithSuggestions: View {
     }
     
     public var body: some View {
-        TextField("Input: ", text: $displayText, selection: $selection)
-            .focused($focus, equals: .textField)
-            .onChange(of: displayText, {
-                guard !suggestions(displayText).isEmpty else { return }
-                if trigger(displayText) {
-                    focus = .complement(0)
-                    showComplementList = true
-                } else {
-                    showComplementList = false
-                }
-            })
-            .background {
-                // retrieve text width
-                Text(displayText).hidden()
-                    .readGeom(onChange: { proxy in currentTextWidth = proxy.size.width })
-            }
-            .overlay(content: {
-                if showComplementList {
-                    let suggestionItems = suggestions(displayText)
-                    HStack {
-                        ForEach(suggestionItems.enumerated(), id: \.0, content: { (index, title) in
-                            Button(action: {
-                                complementText = title
-                            }, label: { Text(title) })
-                            .focused($focus, equals: .complement(index))
-                        })
-                        Spacer()
+        VStack(spacing: 0, content: {
+            TextField("Input: ", text: $displayText, selection: $selection)
+                .focused($focus, equals: .textField)
+                .onChange(of: displayText, {
+                    guard !suggestions(displayText).isEmpty else { return }
+                    if trigger(displayText) {
+                        focus = .complement(0)
+                        showComplementList = true
+                    } else {
+                        showComplementList = false
                     }
-                    .onKeyPress(action: { key in
-                        switch keyFunction(key) {
-                        case nil:      return .ignored
-                        case .rightArrow:
-                            guard let focus = focus else { return .ignored }
-                            self.focus = focus.nextComplement(in: suggestionItems.count)
-                        case .leftArrow:
-                            guard let focus = focus else { return .ignored }
-                            self.focus = focus.prevComplement(in: suggestionItems.count)
-                        case .return:
-                            guard let selection = focus?.complementValues else { return .ignored }
-                            complementText = suggestionItems[selection]
-                        case .escape:
-                            self.focus = .textField
-                        }
-                        return .handled
-                    })
-                    .onChange(of: complementText, {
-                        guard !complementText.isEmpty else { return }
-                        displayText = handler(displayText, complementText)
-                        self.complementText = ""
-                        // note: can not combine following two request into one...
-                        DispatchQueue.main.asyncAfter(deadline: .now()+0.001, execute: {
-                            focus = .textField
-                        })
-                        DispatchQueue.main.asyncAfter(deadline: .now()+0.01, execute: {
-                            selection = .init(insertionPoint: displayText.endIndex)
-                        })
-                    })
-                    .onChange(of: focus, {
-                        // note: if complement list loose focus, should disappear
-                        guard let focus = focus else { return }
-                        if !focus.isComplement { showComplementList = false }
-                    })
-                    .offset(x: currentTextWidth, y: 24) // TODO: may need to adjust 24
+                })
+                .readGeom(onChange: { proxy in
+                    print("textFieldWidth: \(textFieldWidth)")
+                    textFieldWidth = proxy.size.width })
+                .background {
+                    // retrieve text width
+                    Text(displayText).hidden()
+                        .readGeom(onChange: { proxy in currentTextWidth = proxy.size.width })
                 }
-            })
-            .border(.red)
+                .overlay(alignment: .leading, content: {
+                    if showComplementList {
+                        let suggestionItems = suggestions(displayText)
+                        ScrollViewReader(content: { scrollProxy in
+                            ScrollView(.horizontal, content: {
+                                HStack {
+                                    ForEach(suggestionItems.enumerated(), id: \.0, content: { (index, title) in
+                                        Button(action: {
+                                            complementText = title
+                                        }, label: { Text(title) }).id(title)
+                                        .focused($focus, equals: .complement(index))
+                                    })
+                                    Spacer()
+                                }
+                                .onKeyPress(action: { key in
+                                    switch keyFunction(key) {
+                                    case nil:      return .ignored
+                                    case .rightArrow:
+                                        guard let focus = focus else { return .ignored }
+                                        self.focus = focus.nextComplement(in: suggestionItems.count)
+                                    case .leftArrow:
+                                        guard let focus = focus else { return .ignored }
+                                        self.focus = focus.prevComplement(in: suggestionItems.count)
+                                    case .return:
+                                        guard let selection = focus?.complementValues else { return .ignored }
+                                        complementText = suggestionItems[selection]
+                                    case .escape:
+                                        self.focus = .textField
+                                    }
+                                    return .handled
+                                })
+                                .onChange(of: complementText, {
+                                    guard !complementText.isEmpty else { return }
+                                    displayText = handler(displayText, complementText)
+                                    self.complementText = ""
+                                    // note: can not combine following two request into one...
+                                    DispatchQueue.main.asyncAfter(deadline: .now()+0.001, execute: {
+                                        focus = .textField
+                                    })
+                                    DispatchQueue.main.asyncAfter(deadline: .now()+0.01, execute: {
+                                        selection = .init(insertionPoint: displayText.endIndex)
+                                    })
+                                })
+                                .onChange(of: focus, {
+                                    // note: if complement list loose focus, should disappear
+                                    guard let focus = focus else { return }
+                                    if !focus.isComplement { showComplementList = false }
+                                })
+                                .onChange(of: focus, {
+                                    // scroll to focused element
+                                    print("try to scroll")
+                                    guard let focusIndex = focus?.complementValues else { return }
+                                    let itemID = suggestionItems[focusIndex]
+                                    scrollProxy.scrollTo(itemID)
+                                    print("scrolled to \(itemID)")
+                                })
+                            })
+                        })
+                        .background(.white.opacity(0.7))
+                        .frame(width: (textFieldWidth - currentTextWidth) * 0.7)
+                        .offset(x: currentTextWidth, y: 24) // TODO: may need to adjust 24
+                    }
+                })
+//            Spacer()
+//            if showComplementList {
+//                let suggestionItems = suggestions(displayText)
+//                ScrollView(.horizontal, content: {
+//                    HStack {
+//                        ForEach(suggestionItems.enumerated(), id: \.0, content: { (index, title) in
+//                            Button(action: {
+//                                complementText = title
+//                            }, label: { Text(title) })
+//                            .focused($focus, equals: .complement(index))
+//                        })
+//                        Spacer()
+//                    }
+//                })
+//            }
+        })
     }
     enum KeyFunction {
         case leftArrow, rightArrow, `return`, escape
@@ -136,5 +170,24 @@ public struct TextFieldWithSuggestions: View {
             if keyPress.key.character == "m" { return .return }
         }
         return nil
+    }
+    
+    var popupMenu: some View {
+        Menu {
+            Button {
+            } label: {
+                Label("New Album", systemImage: "rectangle.stack.badge.plus")
+            }
+            Button {
+            } label: {
+                Label("New Folder", systemImage: "folder.badge.plus")
+            }
+            Button {
+            } label: {
+                Label("New Shared Album", systemImage: "rectangle.stack.badge.person.crop")
+            }
+        } label: {
+            Label("Add New", systemImage: "plus")
+        }
     }
 }

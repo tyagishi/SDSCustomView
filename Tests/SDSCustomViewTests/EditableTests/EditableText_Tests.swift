@@ -10,6 +10,7 @@ import SwiftUI
 import ViewInspector
 @testable import SDSCustomView
 
+@available(iOS 15, macOS 12, *)
 final class EditableText_Tests: XCTestCase {
 
     @MainActor
