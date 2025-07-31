@@ -11,43 +11,43 @@ import SDSViewExtension
 
 @IsCheckEnum
 @AssociatedValueEnum
-public enum TextFieldWithSuggestionsViewAdjustment {
-    case none
+public enum TextFieldWithSuggestionsViewStartAdjustment {
+    case startOfField
     case endOfText
-    case specify(CGFloat)
+    case specify(CGFloat) // point from start
 }
 public struct TextFieldWithSuggestionsViewAdjustmentKey: EnvironmentKey {
-    public typealias Value = TextFieldWithSuggestionsViewAdjustment
-    public static let defaultValue = TextFieldWithSuggestionsViewAdjustment.endOfText
+    public typealias Value = TextFieldWithSuggestionsViewStartAdjustment
+    public static let defaultValue = TextFieldWithSuggestionsViewStartAdjustment.endOfText
 }
 
 @IsCheckEnum
 @AssociatedValueEnum
-public enum TextFieldWithSuggestionsViewWidth {
+public enum TextFieldWithSuggestionsViewWidthAdjustment {
     case tillEndOfField
-    case ratio(CGFloat)
+    case ratio(CGFloat) // ratio from remaining field width (affected from start adjustment)
 }
 
 public struct TextFieldWithSuggestionsViewWidthKey: EnvironmentKey {
-    public typealias Value = TextFieldWithSuggestionsViewWidth
-    public static let defaultValue = TextFieldWithSuggestionsViewWidth.tillEndOfField
+    public typealias Value = TextFieldWithSuggestionsViewWidthAdjustment
+    public static let defaultValue = TextFieldWithSuggestionsViewWidthAdjustment.tillEndOfField
 }
 extension EnvironmentValues {
-    public var textFieldWithSuggestionsViewAdjustment: TextFieldWithSuggestionsViewAdjustment {
+    public var suggestionsViewStart: TextFieldWithSuggestionsViewStartAdjustment {
         get { return self[TextFieldWithSuggestionsViewAdjustmentKey.self] }
         set { self[TextFieldWithSuggestionsViewAdjustmentKey.self] = newValue }
     }
-    public var textFieldWithSuggestionsViewWidth: TextFieldWithSuggestionsViewWidth {
+    public var suggestionsViewWidth: TextFieldWithSuggestionsViewWidthAdjustment {
         get { return self[TextFieldWithSuggestionsViewWidthKey.self] }
         set { self[TextFieldWithSuggestionsViewWidthKey.self] = newValue }
     }
 }
 extension View {
-    public func suggestionsViewAdjustment(_ alignment: TextFieldWithSuggestionsViewAdjustment = .endOfText) -> some View {
-        self.environment(\.textFieldWithSuggestionsViewAdjustment, alignment)
+    public func suggestionsViewAdjustment(_ alignment: TextFieldWithSuggestionsViewStartAdjustment = .endOfText) -> some View {
+        self.environment(\.suggestionsViewStart, alignment)
     }
-    public func suggestionsViewWidth(_ alignment: TextFieldWithSuggestionsViewWidth = .tillEndOfField) -> some View {
-        self.environment(\.textFieldWithSuggestionsViewWidth, alignment)
+    public func suggestionsViewWidth(_ alignment: TextFieldWithSuggestionsViewWidthAdjustment = .tillEndOfField) -> some View {
+        self.environment(\.suggestionsViewWidth, alignment)
     }
 }
 
@@ -71,8 +71,8 @@ enum FocusElement: Hashable {
 
 @available(iOS 18, macOS 15, *)
 public struct TextFieldWithSuggestions: View {
-    @Environment(\.textFieldWithSuggestionsViewAdjustment) var viewAdjustment
-    @Environment(\.textFieldWithSuggestionsViewWidth) var viewWidth
+    @Environment(\.suggestionsViewStart) var viewAdjustment
+    @Environment(\.suggestionsViewWidth) var viewWidth
     @Binding var displayText: String
     let suggestions: (String) -> [String]
     let trigger: (String) -> Bool
@@ -199,7 +199,7 @@ public struct TextFieldWithSuggestions: View {
     
     func offsetX(_ currentTextWidth: CGFloat) -> CGFloat {
         switch viewAdjustment {
-        case .none:                return 0
+        case .startOfField:                return 0
         case .endOfText:           return currentTextWidth
         case .specify(let offset): return offset
         }
