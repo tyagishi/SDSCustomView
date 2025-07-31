@@ -74,6 +74,7 @@ public struct TextFieldWithSuggestions: View {
     @Environment(\.suggestionsViewStart) var viewAdjustment
     @Environment(\.suggestionsViewWidth) var viewWidth
     @Binding var displayText: String
+    let prompt: String
     let suggestions: (String) -> [String]
     let trigger: (String) -> Bool
     let handler: (String, String) -> String
@@ -86,10 +87,13 @@ public struct TextFieldWithSuggestions: View {
     @State private var currentTextWidth: CGFloat = 0
     @State private var textFieldWidth: CGFloat = 0
 
-    public init(_ text: Binding<String>, suggestions: @escaping (String) -> [String],
+    public init(_ text: Binding<String>,
+                prompt: String? = nil,
+                suggestions: @escaping (String) -> [String],
                 trigger: @escaping (String) -> Bool,
                 handler: @escaping (String, String) -> String) {
         self._displayText = text
+        self.prompt = prompt ?? ""
         self.suggestions = suggestions
         self.trigger = trigger
         self.handler = handler
@@ -97,7 +101,7 @@ public struct TextFieldWithSuggestions: View {
     
     public var body: some View {
         VStack(spacing: 0, content: {
-            TextField("Input: ", text: $displayText, selection: $selection)
+            TextField(prompt, text: $displayText, selection: $selection)
                 .focused($focus, equals: .textField)
                 .onChange(of: displayText, {
                     guard !suggestions(displayText).isEmpty else { return }
