@@ -128,3 +128,56 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         }
     }
 }
+
+@available(iOS 15, macOS 12, *)
+public struct EditableDateRange<F: ParseableFormatStyle>: View where F.FormatInput == Date, F.FormatOutput == String {
+    @Binding var dateRange: Range<Date>
+    let fromFormat: F
+    let toFormat: F
+    let initMode: EditableMode
+    let placeholder: String
+    let editIcon: Image
+    let doneIcon: Image
+    let alignment: Alignment
+    let fromDisplayComponents: DatePickerComponents
+    let toDisplayComponents: DatePickerComponents
+    let editClick: Int
+
+    public init(range dateRange: Binding<Range<Date>>,
+                fromFormat: F = Date.FormatStyle(),
+                toFormat: F = Date.FormatStyle(date: .omitted),
+                initMode: EditableMode = .editable,
+                placeholder: String = "",
+                editIcon: Image = Image(systemName: "pencil"),
+                doneIcon: Image = Image(systemName: "return"),
+                editClick: Int = 1,
+                fromDisplayComponents: DatePickerComponents = [.hourAndMinute, .date],
+                toDisplayComponents: DatePickerComponents = [.hourAndMinute],
+                alignment: Alignment = .leading) {
+        self._dateRange = dateRange
+        self.fromFormat = fromFormat
+        self.toFormat = toFormat
+        self.initMode = initMode
+        self.placeholder = placeholder
+        self.editIcon = editIcon
+        self.doneIcon = doneIcon
+        self.alignment = alignment
+        self.fromDisplayComponents = fromDisplayComponents
+        self.toDisplayComponents = toDisplayComponents
+        self.editClick = editClick
+    }
+    
+    public var body: some View {
+        HStack {
+            EditableDate(date: Binding<Date>(get: { dateRange.lowerBound },
+                                             set: { newDate in dateRange = newDate..<(dateRange.upperBound) }),
+                         format: fromFormat, initMode: initMode, placeholder: placeholder, editIcon: editIcon,
+                         doneIcon: doneIcon, editClick: editClick, displayComponents: fromDisplayComponents, alignment: alignment)
+            Text(" - ")
+            EditableDate(date: Binding<Date>(get: { dateRange.upperBound },
+                                             set: { newDate in dateRange = (dateRange.lowerBound)..<newDate }),
+                         format: toFormat, initMode: .view, placeholder: placeholder, editIcon: editIcon,
+                         doneIcon: doneIcon, editClick: editClick, displayComponents: toDisplayComponents, alignment: alignment)
+        }
+    }
+}
