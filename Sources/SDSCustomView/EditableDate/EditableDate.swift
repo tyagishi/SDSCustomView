@@ -104,6 +104,10 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
+        .onChange(of: value, perform: { _ in
+            // check and maintain along external update
+            indirectValue = value
+        })
     }
     
     var icon: Image {
@@ -173,7 +177,7 @@ public struct EditableDateRange<F: ParseableFormatStyle>: View where F.FormatInp
                                              set: { newDate in dateRange = newDate..<(dateRange.upperBound) }),
                          format: fromFormat, initMode: initMode, placeholder: placeholder, editIcon: editIcon,
                          doneIcon: doneIcon, editClick: editClick, displayComponents: fromDisplayComponents, alignment: alignment)
-            Text(" - ")
+            Text("-")
             EditableDate(date: Binding<Date>(get: { dateRange.upperBound },
                                              set: { newDate in dateRange = (dateRange.lowerBound)..<newDate }),
                          format: toFormat, initMode: .view, placeholder: placeholder, editIcon: editIcon,
