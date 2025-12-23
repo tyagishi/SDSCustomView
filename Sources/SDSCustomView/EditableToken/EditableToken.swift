@@ -45,26 +45,13 @@ public struct EditableToken: View {
     
     public var body: some View {
         HStack {
-            if editButtonLocation == .leading,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
-            }
-            if underEditing {
-                TokenField(getSet: getSet, selectableTokens: selectableTokens)
-                    .focused($fieldFocus)
-                    .onSubmit { toggleUnderEditing() }
-            } else {
+            switch editButtonLocation {
+            case .leading:
+                button
                 tokenField
-                    .frame(maxWidth: .infinity, alignment: alignment)
-                    .contentShape(Rectangle())
-                    .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
-                    #if os(macOS)
-                    .focusable()
-                    #endif
-            }
-            if editButtonLocation == .trailing,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { editIcon })
+            case .center, .trailing:
+                tokenField
+                button
             }
         }
         .onChange(of: fieldFocus) { _ in
@@ -78,6 +65,13 @@ public struct EditableToken: View {
             TokenView(getSet.getter())
         } else {
             Text(placeholder).foregroundStyle(.gray).opacity(0.8)
+        }
+    }
+    
+    @ViewBuilder
+    var button: some View {
+        if editClick < Int.max {
+            Button(action: { toggleUnderEditing() }, label: { editIcon })
         }
     }
 
