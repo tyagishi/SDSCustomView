@@ -77,56 +77,65 @@ public struct EditableText: View {
     }
     
     public var body: some View {
-        let binding = Binding<String>(get: {
-            return indirectValue
-        }, set: { newValue in
-            indirectValue = newValue
-            if !indirectEdit.flag { value = newValue }
-        })
-        
         HStack {
-            if editButtonLocation == .leading,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { icon })
-            }
-            if underEditing {
-                TextField(placeholder,
-                          text: binding)
-                .frame(width: max(placeholder.size().width, indirectValue.size().width))
-                .focused($fieldFocus)
-                .onSubmit { toggleUnderEditing() }
-                if indirectEdit.flag {
-                    Button(action: {
-                        indirectValue = value
-                        underEditing.toggle()}, label: { indirectEdit.image })
-                }
-            } else {
-                Text((value != "" ? value : placeholder))
-                    .frame(width: max(value.size().width, placeholder.size().width), alignment: alignment)
-                    .contentShape(Rectangle())
-                    .onTapGesture(count: editClick, perform: {
-                        guard editClick < Int.max else { return }
-                        guard editableMode != .view else { return }
-                        toggleUnderEditing()
-                    })
-                    .modify({ view in
-                        if value == "" {
-                            view.foregroundStyle(.gray).opacity(0.8)
-                        } else {
-                            view
-                        }
-                    })
-            }
-            if editButtonLocation == .trailing,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { icon })
-                Spacer()
+            switch editButtonLocation {
+            case .leading:
+                button
+                text
+            case .center, .trailing:
+                text
+                button
             }
         }
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
         .onAppear { self.didAppear?(self) } // 2.
+    }
+    
+    @ViewBuilder
+    var text: some View {
+        let binding = Binding<String>(get: {
+            return indirectValue
+        }, set: { newValue in
+            indirectValue = newValue
+            if !indirectEdit.flag { value = newValue }
+        })
+        if underEditing {
+            TextField(placeholder,
+                      text: binding)
+            .frame(width: max(placeholder.size().width, indirectValue.size().width))
+            .focused($fieldFocus)
+            .onSubmit { toggleUnderEditing() }
+            if indirectEdit.flag {
+                Button(action: {
+                    indirectValue = value
+                    underEditing.toggle()}, label: { indirectEdit.image })
+            }
+        } else {
+            Text((value != "" ? value : placeholder))
+                .frame(width: max(value.size().width, placeholder.size().width), alignment: alignment)
+                .contentShape(Rectangle())
+                .onTapGesture(count: editClick, perform: {
+                    guard editClick < Int.max else { return }
+                    guard editableMode != .view else { return }
+                    toggleUnderEditing()
+                })
+                .modify({ view in
+                    if value == "" {
+                        view.foregroundStyle(.gray).opacity(0.8)
+                    } else {
+                        view
+                    }
+                })
+        }
+    }
+    
+    @ViewBuilder
+    var button: some View {
+        if editClick < Int.max {
+            Button(action: { toggleUnderEditing() }, label: { icon })
+        }
     }
     
     var icon: Image {
