@@ -92,8 +92,9 @@ public struct EditableText: View {
             if underEditing {
                 TextField(placeholder,
                           text: binding)
-                    .focused($fieldFocus)
-                    .onSubmit { toggleUnderEditing() }
+                .frame(width: max(placeholder.size().width, indirectValue.size().width))
+                .focused($fieldFocus)
+                .onSubmit { toggleUnderEditing() }
                 if indirectEdit.flag {
                     Button(action: {
                         indirectValue = value
@@ -101,7 +102,7 @@ public struct EditableText: View {
                 }
             } else {
                 Text(value)
-                    .frame(maxWidth: .infinity, alignment: alignment)
+                    .frame(width: value.size().width, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: {
                         guard editClick < Int.max else { return }
@@ -112,6 +113,7 @@ public struct EditableText: View {
             if editButtonLocation == .trailing,
                editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { icon })
+                Spacer()
             }
         }
         .onChange(of: fieldFocus) { _ in

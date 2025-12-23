@@ -67,6 +67,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
                 Picker(selection: binding, content: {
                     pickerContent
                 }, label: { Text("Title") }).labelsHidden()
+                    .fixedSize()
 #if os(macOS)
                     .focusable()
 #endif

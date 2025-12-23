@@ -72,6 +72,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
             }
             if underEditing {
                 TextField(placeholder, value: binding, format: formatStyle)
+                    .frame(width: max(placeholder.size().width, formatStyle.format(indirectValue).size().width))
                     .focused($fieldFocus)
                     .foregroundStyle(foregroundColor)
                     .onSubmit { toggleUnderEditing() }
@@ -85,7 +86,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
             } else {
                 Text(formatStyle.format(indirectValue))
                     .foregroundStyle(foregroundColor)
-                    .frame(maxWidth: .infinity, alignment: alignment)
+                    .frame(width: formatStyle.format(indirectValue).size().width )
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
                     .focused($textFocus)
@@ -96,6 +97,7 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
             if editButtonLocation == .trailing,
                editClick < Int.max {
                 Button(action: { toggleUnderEditing() }, label: { icon })
+                Spacer()
             }
         }
         .onChange(of: fieldFocus) { _ in
