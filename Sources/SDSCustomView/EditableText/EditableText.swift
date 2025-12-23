@@ -113,8 +113,8 @@ public struct EditableText: View {
                     underEditing.toggle()}, label: { indirectEdit.image })
             }
         } else {
-            Text((value != "" ? value : placeholder))
-                .frame(width: max(value.size().width, placeholder.size().width), alignment: alignment)
+            Text(displayText)
+                .frame(width: displayText.size().width, alignment: alignment)
                 .contentShape(Rectangle())
                 .onTapGesture(count: editClick, perform: {
                     guard editClick < Int.max else { return }
@@ -129,6 +129,11 @@ public struct EditableText: View {
                     }
                 })
         }
+    }
+    
+    var displayText: String {
+        if value.isEmpty { return placeholder }
+        return value
     }
     
     @ViewBuilder

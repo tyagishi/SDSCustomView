@@ -58,13 +58,33 @@ public struct EditableToken: View {
             if !fieldFocus { underEditing = false }
         }
     }
-
+    
     @ViewBuilder
     var tokenFieldView: some View {
+        if underEditing {
+            let check = getSet.getter()
+            TokenField(getSet: getSet, selectableTokens: selectableTokens)
+                .frame(width: getSet.getter().joined(separator: "[]").size().width * 1.2)
+                .focused($fieldFocus)
+                .onSubmit { toggleUnderEditing() }
+        } else {
+            tokenTextView
+                .contentShape(Rectangle())
+                .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
+                #if os(macOS)
+                .focusable()
+                #endif
+        }
+    }
+
+    @ViewBuilder
+    var tokenTextView: some View {
         if !getSet.getter().isEmpty {
             TokenView(getSet.getter())
+                .frame(width: getSet.getter().joined(separator: "[]").size().width * 1.2)
         } else {
             Text(placeholder).foregroundStyle(.gray).opacity(0.8)
+                .frame(width: placeholder.size().width)
         }
     }
     
