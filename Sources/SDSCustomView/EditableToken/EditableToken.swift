@@ -54,13 +54,13 @@ public struct EditableToken: View {
                     .focused($fieldFocus)
                     .onSubmit { toggleUnderEditing() }
             } else {
-                TokenView(getSet.getter())
+                tokenField
                     .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
-                #if os(macOS)
+                    #if os(macOS)
                     .focusable()
-                #endif
+                    #endif
             }
             if editButtonLocation == .trailing,
                editClick < Int.max {
@@ -71,7 +71,16 @@ public struct EditableToken: View {
             if !fieldFocus { underEditing = false }
         }
     }
-    
+
+    @ViewBuilder
+    var tokenField: some View {
+        if !getSet.getter().isEmpty {
+            TokenView(getSet.getter())
+        } else {
+            Text(placeholder).foregroundStyle(.gray).opacity(0.8)
+        }
+    }
+
     func toggleUnderEditing() {
         underEditing.toggle()
     }

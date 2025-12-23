@@ -101,13 +101,20 @@ public struct EditableText: View {
                         underEditing.toggle()}, label: { indirectEdit.image })
                 }
             } else {
-                Text(value)
-                    .frame(width: value.size().width, alignment: alignment)
+                Text((value != "" ? value : placeholder))
+                    .frame(width: max(value.size().width, placeholder.size().width), alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: {
                         guard editClick < Int.max else { return }
                         guard editableMode != .view else { return }
                         toggleUnderEditing()
+                    })
+                    .modify({ view in
+                        if value == "" {
+                            view.foregroundStyle(.gray).opacity(0.8)
+                        } else {
+                            view
+                        }
                     })
             }
             if editButtonLocation == .trailing,

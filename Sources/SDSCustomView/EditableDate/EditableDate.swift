@@ -69,6 +69,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
                 DatePicker(selection: binding,
                            displayedComponents: displayComponents,
                            label: { Text("") })
+                .frame(width: formatStyle.format(indirectValue).size().width+20)
                 .focused($fieldFocus)
                 .foregroundStyle(foregroundColor)
                 .labelsHidden()
@@ -87,8 +88,8 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
                 }
             } else {
                 Text(formatStyle.format(indirectValue))
+                    .frame(width: formatStyle.format(indirectValue).size().width)
                     .foregroundStyle(foregroundColor)
-                    .frame(maxWidth: .infinity, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
                     .focused($textFocus)
