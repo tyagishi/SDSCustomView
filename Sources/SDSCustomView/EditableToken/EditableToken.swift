@@ -47,11 +47,11 @@ public struct EditableToken: View {
         HStack {
             switch editButtonLocation {
             case .leading:
-                button
-                tokenField
+                buttonView
+                tokenFieldView
             case .center, .trailing:
-                tokenField
-                button
+                tokenFieldView
+                buttonView
             }
         }
         .onChange(of: fieldFocus) { _ in
@@ -60,7 +60,7 @@ public struct EditableToken: View {
     }
 
     @ViewBuilder
-    var tokenField: some View {
+    var tokenFieldView: some View {
         if !getSet.getter().isEmpty {
             TokenView(getSet.getter())
         } else {
@@ -69,7 +69,7 @@ public struct EditableToken: View {
     }
     
     @ViewBuilder
-    var button: some View {
+    var buttonView: some View {
         if editClick < Int.max {
             Button(action: { toggleUnderEditing() }, label: { editIcon })
         }

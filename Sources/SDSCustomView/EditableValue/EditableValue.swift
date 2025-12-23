@@ -56,6 +56,26 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
     }
     
     public var body: some View {
+        HStack {
+            switch editButtonLocation {
+            case .leading:
+                buttonView
+                valueView
+            case .center, .trailing:
+                valueView
+                buttonView
+            }
+        }
+        .onChange(of: fieldFocus) { _ in
+            if !fieldFocus { toggleUnderEditing(forceTo: false) }
+        }
+        .onChange(of: textFocus) { _ in
+            if textFocus { toggleUnderEditing() }
+        }
+    }
+
+    @ViewBuilder
+    var valueView: some View {
         let binding = Binding<V>(get: {
             return indirectValue
         }, set: { newValue in
@@ -64,47 +84,36 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
             indirectValue = newValue
             if !indirectEdit.flag { value = newValue }
         })
-        
-        HStack {
-            if editButtonLocation == .leading,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { icon })
+        if underEditing {
+            TextField(placeholder, value: binding, format: formatStyle)
+                .frame(width: max(placeholder.size().width, formatStyle.format(indirectValue).size().width))
+                .focused($fieldFocus)
+                .foregroundStyle(foregroundColor)
+                .onSubmit { toggleUnderEditing() }
+                .multilineTextAlignment(textAlignment(alignment))
+                .border(isValidValue ? .clear : .red)
+            if indirectEdit.flag {
+                Button(action: {
+                    indirectValue = value
+                    underEditing.toggle()}, label: { indirectEdit.image })
             }
-            if underEditing {
-                TextField(placeholder, value: binding, format: formatStyle)
-                    .frame(width: max(placeholder.size().width, formatStyle.format(indirectValue).size().width))
-                    .focused($fieldFocus)
-                    .foregroundStyle(foregroundColor)
-                    .onSubmit { toggleUnderEditing() }
-                    .multilineTextAlignment(textAlignment(alignment))
-                    .border(isValidValue ? .clear : .red)
-                if indirectEdit.flag {
-                    Button(action: {
-                        indirectValue = value
-                        underEditing.toggle()}, label: { indirectEdit.image })
-                }
-            } else {
-                Text(formatStyle.format(indirectValue))
-                    .foregroundStyle(foregroundColor)
-                    .frame(width: formatStyle.format(indirectValue).size().width )
-                    .contentShape(Rectangle())
-                    .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
-                    .focused($textFocus)
-                #if os(macOS)
-                    .focusable()
-                #endif
-            }
-            if editButtonLocation == .trailing,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { icon })
-                Spacer()
-            }
+        } else {
+            Text(formatStyle.format(indirectValue))
+                .foregroundStyle(foregroundColor)
+                .frame(width: formatStyle.format(indirectValue).size().width )
+                .contentShape(Rectangle())
+                .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
+                .focused($textFocus)
+            #if os(macOS)
+                .focusable()
+            #endif
         }
-        .onChange(of: fieldFocus) { _ in
-            if !fieldFocus { toggleUnderEditing(forceTo: false) }
-        }
-        .onChange(of: textFocus) { _ in
-            if textFocus { toggleUnderEditing() }
+    }
+    
+    @ViewBuilder
+    var buttonView: some View {
+        if editClick < Int.max {
+            Button(action: { toggleUnderEditing() }, label: { icon })
         }
     }
     

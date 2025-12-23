@@ -53,53 +53,14 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
     }
     
     public var body: some View {
-        let binding = Binding<Date>(get: {
-            return indirectValue
-        }, set: { newValue in
-            indirectValue = newValue
-            if !indirectEdit.flag { value = newValue }
-        })
-        
         HStack(spacing: 2) {
-            if editButtonLocation == .leading,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { icon })
-            }
-            if underEditing {
-                DatePicker(selection: binding,
-                           displayedComponents: displayComponents,
-                           label: { Text("") })
-                .frame(width: formatStyle.format(indirectValue).size().width+20)
-                .focused($fieldFocus)
-                .foregroundStyle(foregroundColor)
-                .labelsHidden()
-                .onSubmit { toggleUnderEditing() }
-                .multilineTextAlignment(textAlignment(alignment))
-                .modify {
-                    if #available(macOS 14, iOS 17, *) {
-                        $0.onKeyPress(.return , action: { Task { @MainActor in toggleUnderEditing()}; return .handled })
-                    } else {
-                        $0
-                    }
-                }
-                if indirectEdit.flag {
-                    Button(action: {
-                        underEditing.toggle()}, label: { indirectEdit.image })
-                }
-            } else {
-                Text(formatStyle.format(indirectValue))
-                    .frame(width: formatStyle.format(indirectValue).size().width)
-                    .foregroundStyle(foregroundColor)
-                    .contentShape(Rectangle())
-                    .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
-                    .focused($textFocus)
-                #if os(macOS)
-                    .focusable()
-                #endif
-            }
-            if editButtonLocation == .trailing,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { icon })
+            switch editButtonLocation {
+            case .leading:
+                buttonView
+                dateView
+            case .center, .trailing:
+                dateView
+                buttonView
             }
         }
         .onChange(of: fieldFocus) { _ in
@@ -109,6 +70,55 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
             // check and maintain along external update
             indirectValue = value
         })
+    }
+    
+    @ViewBuilder
+    var dateView: some View {
+        let binding = Binding<Date>(get: {
+            return indirectValue
+        }, set: { newValue in
+            indirectValue = newValue
+            if !indirectEdit.flag { value = newValue }
+        })
+        if underEditing {
+            DatePicker(selection: binding,
+                       displayedComponents: displayComponents,
+                       label: { Text("") })
+            .frame(width: formatStyle.format(indirectValue).size().width+20)
+            .focused($fieldFocus)
+            .foregroundStyle(foregroundColor)
+            .labelsHidden()
+            .onSubmit { toggleUnderEditing() }
+            .multilineTextAlignment(textAlignment(alignment))
+            .modify {
+                if #available(macOS 14, iOS 17, *) {
+                    $0.onKeyPress(.return , action: { Task { @MainActor in toggleUnderEditing()}; return .handled })
+                } else {
+                    $0
+                }
+            }
+            if indirectEdit.flag {
+                Button(action: {
+                    underEditing.toggle()}, label: { indirectEdit.image })
+            }
+        } else {
+            Text(formatStyle.format(indirectValue))
+                .frame(width: formatStyle.format(indirectValue).size().width)
+                .foregroundStyle(foregroundColor)
+                .contentShape(Rectangle())
+                .onTapGesture(count: editClick, perform: { toggleUnderEditing() })
+                .focused($textFocus)
+            #if os(macOS)
+                .focusable()
+            #endif
+        }
+    }
+    
+    @ViewBuilder
+    var buttonView: some View {
+        if editClick < Int.max {
+            Button(action: { toggleUnderEditing() }, label: { icon })
+        }
     }
     
     var icon: Image {

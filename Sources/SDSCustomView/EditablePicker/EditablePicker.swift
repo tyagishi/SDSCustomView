@@ -51,56 +51,65 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
     }
     
     public var body: some View {
+        HStack {
+            switch editButtonLocation {
+            case .leading:
+                buttonView
+                pickerView
+            case .center, .trailing:
+                pickerView
+                buttonView
+            }
+        }
+        .onChange(of: fieldFocus) { _ in
+            if !fieldFocus { toggleUnderEditing(forceTo: false) }
+        }
+    }
+    @ViewBuilder
+    var pickerView: some View {
         let binding = Binding<Selection>(get: {
             return indirectValue
         }, set: { newValue in
             indirectValue = newValue
             if !indirectEdit.flag { value = newValue }
         })
-        
-        HStack {
-            if editButtonLocation == .leading,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { icon })
-            }
-            if underEditing {
-                Picker(selection: binding, content: {
-                    pickerContent
-                }, label: { Text("Title") }).labelsHidden()
-                    .fixedSize()
+        if underEditing {
+            Picker(selection: binding, content: {
+                pickerContent
+            }, label: { Text("Title") }).labelsHidden()
+                .fixedSize()
 #if os(macOS)
-                    .focusable()
+                .focusable()
 #endif
-                    .focused($fieldFocus)
-                    .onSubmit { toggleUnderEditing() }
-                    .modify {
-                        if #available(macOS 14, iOS 17, *) {
-                            $0.onKeyPress(.return , action: { Task { @MainActor in toggleUnderEditing()}; return .handled })
-                        } else {
-                            $0
-                        }
+                .focused($fieldFocus)
+                .onSubmit { toggleUnderEditing() }
+                .modify {
+                    if #available(macOS 14, iOS 17, *) {
+                        $0.onKeyPress(.return , action: { Task { @MainActor in toggleUnderEditing()}; return .handled })
+                    } else {
+                        $0
                     }
-                if indirectEdit.flag {
-                    Button(action: {
-                        indirectValue = value
-                        underEditing.toggle()}, label: { indirectEdit.image })
                 }
-            } else {
-                Text(formatter(value))
-                    .frame(maxWidth: .infinity, alignment: alignment)
-                    .contentShape(Rectangle())
-                    .onTapGesture(count: editClick, perform: {
-                        guard editClick < Int.max else { return }
-                        toggleUnderEditing()
-                    })
+            if indirectEdit.flag {
+                Button(action: {
+                    indirectValue = value
+                    underEditing.toggle()}, label: { indirectEdit.image })
             }
-            if editButtonLocation == .trailing,
-               editClick < Int.max {
-                Button(action: { toggleUnderEditing() }, label: { icon })
-            }
+        } else {
+            Text(formatter(value))
+                .frame(maxWidth: .infinity, alignment: alignment)
+                .contentShape(Rectangle())
+                .onTapGesture(count: editClick, perform: {
+                    guard editClick < Int.max else { return }
+                    toggleUnderEditing()
+                })
         }
-        .onChange(of: fieldFocus) { _ in
-            if !fieldFocus { toggleUnderEditing(forceTo: false) }
+    }
+    
+    @ViewBuilder
+    var buttonView: some View {
+        if editClick < Int.max {
+            Button(action: { toggleUnderEditing() }, label: { editIcon })
         }
     }
     
