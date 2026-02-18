@@ -62,7 +62,6 @@ public struct EditableToken: View {
     @ViewBuilder
     var tokenFieldView: some View {
         if underEditing {
-            let check = getSet.getter()
             TokenField(getSet: getSet, selectableTokens: selectableTokens)
                 .frame(width: getSet.getter().joined(separator: "[]").size().width * 1.2)
                 .focused($fieldFocus)
