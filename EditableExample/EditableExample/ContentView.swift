@@ -118,27 +118,6 @@ struct EditableValueExample: View {
     }
 }
 
-struct EditableDateExample: View {
-    @State private var date = Date()
-    var body: some View {
-        VStack {
-            EditableDate(date: $date, displayComponents: [.date])
-            EditableDate(date: $date, displayComponents: [.date])
-                .indirectEdit()
-            EditableDate(date: $date, displayComponents: [.hourAndMinute])
-            EditableDate(date: $date, displayComponents: [.hourAndMinute])
-                .indirectEdit()
-            Text("value: \(date.formatted())")
-                .focusable()
-        }
-        .onChange(of: date, {
-            print("date is changed")
-        })
-
-    }
-}
-
-
 struct EditablePickerExample: View {
     @State private var selection = "Hello"
     var body: some View {

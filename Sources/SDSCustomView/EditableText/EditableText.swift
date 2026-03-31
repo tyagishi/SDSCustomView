@@ -14,10 +14,6 @@ extension OSLog {
     fileprivate static var log = Logger(.disabled)
 }
 
-public enum EditableMode {
-    case editable, view, edit
-}
-
 /// EditableText: Text/TextField for string value
 /// value: string value for editing
 /// alignment: alignment for Text
