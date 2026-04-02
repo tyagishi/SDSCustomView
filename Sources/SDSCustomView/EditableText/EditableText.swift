@@ -97,34 +97,39 @@ public struct EditableText: View {
             indirectValue = newValue
             if !indirectEdit.flag { value = newValue }
         })
-        if underEditing {
-            TextField(placeholder,
-                      text: binding)
-            .frame(width: max(placeholder.size().width, indirectValue.size().width))
-            .focused($fieldFocus)
-            .onSubmit { toggleUnderEditing() }
-            if indirectEdit.flag {
-                Button(action: {
-                    indirectValue = value
-                    underEditing.toggle()}, label: { indirectEdit.image })
+        Group {
+            if underEditing {
+                TextField(placeholder,
+                          text: binding)
+                .frame(width: max(placeholder.size().width, indirectValue.size().width))
+                .focused($fieldFocus)
+                .onSubmit { toggleUnderEditing() }
+                if indirectEdit.flag {
+                    Button(action: {
+                        indirectValue = value
+                        underEditing.toggle()}, label: { indirectEdit.image })
+                }
+            } else {
+                Text(displayText)
+                    .frame(width: displayText.size().width, alignment: alignment)
+                    .contentShape(Rectangle())
+                    .onTapGesture(count: editClick, perform: {
+                        guard editClick < Int.max else { return }
+                        guard editableMode != .view else { return }
+                        toggleUnderEditing()
+                    })
+                    .modify({ view in
+                        if value == "" {
+                            view.foregroundStyle(.gray).opacity(0.8)
+                        } else {
+                            view
+                        }
+                    })
             }
-        } else {
-            Text(displayText)
-                .frame(width: displayText.size().width, alignment: alignment)
-                .contentShape(Rectangle())
-                .onTapGesture(count: editClick, perform: {
-                    guard editClick < Int.max else { return }
-                    guard editableMode != .view else { return }
-                    toggleUnderEditing()
-                })
-                .modify({ view in
-                    if value == "" {
-                        view.foregroundStyle(.gray).opacity(0.8)
-                    } else {
-                        view
-                    }
-                })
         }
+        .onChange(of: value, perform: { _ in 
+            indirectValue = value
+        })
     }
     
     var displayText: String {
