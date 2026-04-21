@@ -22,7 +22,7 @@ let package = Package(
         .package(url: "https://github.com/tyagishi/SDSFoundationExtension", from: "1.3.2"),
         .package(url: "https://github.com/tyagishi/SDSViewExtension", from: "4.2.0"),
         .package(url: "https://github.com/tyagishi/SDSDataStructure", from: "4.0.0"),
-        .package(url: "https://github.com/tyagishi/SDSMacros", from: "2.0.0"),
+        .package(url: "https://github.com/tyagishi/SDSMacros", from: "3.0.0"),
         .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", exact: "0.56.1"),
         .package(url: "https://github.com/nalexn/ViewInspector", branch: "0.10.0")
     ],
