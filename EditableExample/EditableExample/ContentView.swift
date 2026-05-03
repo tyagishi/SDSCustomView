@@ -42,8 +42,8 @@ struct EditableDictionaryExample: View {
         VStack {
             Text("EditableDictionary")
             EditableStringStringDictionary(localDictionary: $strStrDic)
-            EditableStringDecimalDictionary(localDictionary: $strDecDic,
-                                            formatstyle: Decimal.FormatStyle.Currency(code: "JPY"), newValue: .zero)
+            EditableStringDecimalDictionary($strDecDic,
+                                            formatstyle: Decimal.FormatStyle.Currency(code: "JPY"), newDefaultValue: .zero)
         }
     }
         
@@ -88,10 +88,10 @@ public struct EditableStringDecimalDictionary<V, F>: View where F: ParseableForm
     @Binding var localDictionary: Dictionary<String, V>
     let formatstyle: F
     
-    public init(localDictionary: Binding<Dictionary<String, V>>, formatstyle: F, newValue: V) {
+    public init(_ localDictionary: Binding<Dictionary<String, V>>, formatstyle: F, newDefaultValue: V) {
         self._localDictionary = localDictionary
         self.formatstyle = formatstyle
-        self.newValue = newValue
+        self.newValue = newDefaultValue
     }
     
     @State private var newKey: String = ""
