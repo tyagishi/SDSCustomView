@@ -3,6 +3,35 @@
 convenience view collection
 every view is already used for app but basically all views are under develop for improvement.
 
+## EditableStringStringDictionary/ EditableStringDictionary
+dictionary edit fields for [String: String] or [String: V] V has ParseableFormatStyle (and need initial value)
+
+![EditableDictionaries](https://github.com/user-attachments/assets/fe55f881-86f3-4142-92c2-3d57fb7e2d9c)
+
+```swift
+struct EditableDictionaryExample: View {
+    @State private var strStrDic = ["Hello": "World",
+                                    "こんにちわ": "せかい" ]
+    @State private var strDecDic = ["Cost1": Decimal(1000),
+                                    "Cost2": Decimal(525) ]
+    
+    var body: some View {
+        VStack {
+            GroupBox("EditableStringStringDictionary", content: {
+                EditableStringStringDictionary($strStrDic)
+                    .fixedSize(horizontal: true, vertical: false)
+            })
+            GroupBox("EditableStringDictionary", content: {
+                EditableStringDictionary($strDecDic,
+                                         formatstyle: Decimal.FormatStyle.Currency(code: "JPY"), newDefaultValue: .zero)
+                .fixedSize(horizontal: true, vertical: false)
+            })
+        }
+    }
+}
+```
+
+
 ## TextFieldWithSuggestions
 TextField which can 
 - suggest with current string in TextField
