@@ -77,9 +77,11 @@ public struct EditableText: View {
             switch editButtonLocation {
             case .leading:
                 button
+                    .padding(.trailing, 8)
                 text
             case .center, .trailing:
                 text
+                    .padding(.trailing, 8)
                 button
             }
         }
@@ -99,18 +101,22 @@ public struct EditableText: View {
         })
         Group {
             if underEditing {
-                TextField(placeholder,
-                          text: binding)
-                .frame(width: max(placeholder.size().width, indirectValue.size().width))
-                .focused($fieldFocus)
-                .onSubmit { toggleUnderEditing() }
-                if indirectEdit.flag {
-                    Button(action: {
-                        indirectValue = value
-                        underEditing.toggle()}, label: { indirectEdit.image })
+                HStack {
+                    TextField(placeholder,
+                              text: binding)
+                    .fixedSize()
+                    .frame(width: max(placeholder.size().width, indirectValue.size().width))
+                    .focused($fieldFocus)
+                    .onSubmit { toggleUnderEditing() }
+                    if indirectEdit.flag {
+                        Button(action: {
+                            indirectValue = value
+                            underEditing.toggle()}, label: { indirectEdit.image })
+                    }
                 }
             } else {
                 Text(displayText)
+                    .fixedSize()
                     .frame(width: displayText.size().width, alignment: alignment)
                     .contentShape(Rectangle())
                     .onTapGesture(count: editClick, perform: {
@@ -127,8 +133,8 @@ public struct EditableText: View {
                     })
             }
         }
-        .onChange(of: value, perform: { _ in 
-            indirectValue = value
+        .onChange(of: value, { _, new in
+            indirectValue = new
         })
     }
     

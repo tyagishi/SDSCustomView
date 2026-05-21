@@ -57,18 +57,20 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
             switch editButtonLocation {
             case .leading:
                 buttonView
+                    .padding(.trailing, 8)
                 dateView
             case .center, .trailing:
                 dateView
+                    .padding(.trailing, 8)
                 buttonView
             }
         }
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
-        .onChange(of: value, perform: { _ in
+        .onChange(of: value, { _, new in
             // check and maintain along external update
-            indirectValue = value
+            indirectValue = new
         })
     }
     
@@ -103,6 +105,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
             }
         } else {
             Text(formatStyle.format(indirectValue))
+                .fixedSize()
                 .frame(width: formatStyle.format(indirectValue).size().width)
                 .foregroundStyle(foregroundColor)
                 .contentShape(Rectangle())
