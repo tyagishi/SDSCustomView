@@ -72,6 +72,10 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
         .onChange(of: textFocus) { _ in
             if textFocus { toggleUnderEditing() }
         }
+        .onChange(of: value, { _, new in
+            // check and maintain along external update
+            indirectValue = new
+        })
     }
 
     @ViewBuilder
