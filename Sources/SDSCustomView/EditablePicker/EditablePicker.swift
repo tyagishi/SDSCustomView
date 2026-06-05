@@ -64,6 +64,10 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
         .onChange(of: fieldFocus) { _ in
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
+        .onChange(of: value, { _, new in
+            // check and maintain along external update
+            indirectValue = new
+        })
     }
     @ViewBuilder
     var pickerView: some View {
