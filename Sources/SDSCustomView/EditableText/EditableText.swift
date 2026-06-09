@@ -85,7 +85,7 @@ public struct EditableText: View {
                 button
             }
         }
-        .onChange(of: fieldFocus) { _ in
+        .onChange(of: fieldFocus) {
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
         .onAppear { self.didAppear?(self) } // 2.
@@ -133,6 +133,7 @@ public struct EditableText: View {
                     })
             }
         }
+        .accessibilityLabel("EditableTextView")
         .onChange(of: value, { _, new in
             indirectValue = new
         })

@@ -41,10 +41,7 @@ public struct RepeatDateField<T: RandomAccessCollection<DateRepeatFrequency>>: V
                 }
             }, label: { Text("Adjustment") }).fixedSize()
         }
-        .onAppear {
-            calcDates()
-        }
-        .onChange(of: [startDate.description, endDate.description, frequency.rawValue, adjustment.rawValue], perform: { _ in
+        .onChange(of: [startDate.description, endDate.description, frequency.rawValue, adjustment.rawValue], initial: true, {
             calcDates()
         })
     }

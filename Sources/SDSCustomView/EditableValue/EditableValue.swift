@@ -66,10 +66,10 @@ public struct EditableValue<V: Equatable, F: ParseableFormatStyle>: View where F
                 buttonView
             }
         }
-        .onChange(of: fieldFocus) { _ in
+        .onChange(of: fieldFocus) {
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
-        .onChange(of: textFocus) { _ in
+        .onChange(of: textFocus) {
             if textFocus { toggleUnderEditing() }
         }
         .onChange(of: value, { _, new in

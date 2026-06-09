@@ -65,7 +65,7 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
                 buttonView
             }
         }
-        .onChange(of: fieldFocus) { _ in
+        .onChange(of: fieldFocus) {
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
         .onChange(of: value, { _, new in
@@ -148,10 +148,10 @@ public struct EditableDate<F: ParseableFormatStyle>: View where F.FormatInput ==
 }
 
 @available(iOS 15, macOS 12, *)
-public struct EditableDateRange<F: ParseableFormatStyle>: View where F.FormatInput == Date, F.FormatOutput == String {
+public struct EditableDateRange: View {
     @Binding var dateRange: Range<Date>
-    let fromFormat: F
-    let toFormat: F
+    let fromFormat: Date.FormatStyle
+    let toFormat: Date.FormatStyle
     let initMode: EditableMode
     let placeholder: String
     let editIcon: Image
@@ -162,8 +162,8 @@ public struct EditableDateRange<F: ParseableFormatStyle>: View where F.FormatInp
     let editClick: Int
 
     public init(range dateRange: Binding<Range<Date>>,
-                fromFormat: F = Date.FormatStyle(),
-                toFormat: F = Date.FormatStyle(date: .omitted),
+                fromFormat: Date.FormatStyle = Date.FormatStyle(),
+                toFormat: Date.FormatStyle = Date.FormatStyle(date: .omitted),
                 initMode: EditableMode = .editable,
                 placeholder: String = "",
                 editIcon: Image = Image(systemName: "pencil"),

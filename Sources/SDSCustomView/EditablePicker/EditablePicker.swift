@@ -61,7 +61,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
                 buttonView
             }
         }
-        .onChange(of: fieldFocus) { _ in
+        .onChange(of: fieldFocus) {
             if !fieldFocus { toggleUnderEditing(forceTo: false) }
         }
         .onChange(of: value, { _, new in

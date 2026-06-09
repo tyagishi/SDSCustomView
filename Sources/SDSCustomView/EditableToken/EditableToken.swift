@@ -54,7 +54,7 @@ public struct EditableToken: View {
                 buttonView
             }
         }
-        .onChange(of: fieldFocus) { _ in
+        .onChange(of: fieldFocus) {
             if !fieldFocus { underEditing = false }
         }
     }
