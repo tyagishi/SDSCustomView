@@ -25,6 +25,14 @@ struct EditablePickerExample: View {
                 Text("Sekai").tag("Sekai")
             }, formatter: { $0 })
                 .indirectEdit()
+            
+            EditablePicker(value: $selection, pickerContent: {
+                Text("Hello").tag("Hello")
+                Text("World").tag("World")
+                Text("Konnichiwa").tag("Konnichiwa")
+                Text("Sekai").tag("Sekai")
+            }, formatter: { $0 }, labelString: "GivenLabel" )
+                .indirectEdit()
             Text("value: \(selection)")
                 .focusable()
         }

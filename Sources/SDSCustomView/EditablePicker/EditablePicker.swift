@@ -26,6 +26,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
     let editIcon: Image
     let doneIcon: Image
     @State private var indirectValue: Selection
+    let labelString: String?
 
     @FocusState private var fieldFocus: Bool
 
@@ -36,7 +37,8 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
                 formatter: @escaping ((Selection) -> String),
                 editIcon: Image = Image(systemName: "pencil"),
                 doneIcon: Image = Image(systemName: "return"),
-                editClick: Int = 1, alignment: Alignment = .leading) {
+                editClick: Int = 1, alignment: Alignment = .leading,
+                labelString: String? = nil ) {
         self._value = value
         self.placeholder = placeholder
         self.pickerContent = pickerContent()
@@ -45,6 +47,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
         self.doneIcon = doneIcon
         self.alignment = alignment
         self.editClick = editClick
+        self.labelString = labelString
         
         indirectValue = value.wrappedValue
         underEditing = (initMode == .edit)
@@ -80,7 +83,7 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
         if underEditing {
             Picker(selection: binding, content: {
                 pickerContent
-            }, label: { Text("Title") }).labelsHidden()
+            }, label: { Text(labelString ?? "") })
                 .fixedSize()
 #if os(macOS)
                 .focusable()
@@ -100,13 +103,17 @@ public struct EditablePicker<Content: View, Selection: Hashable>: View {
                     underEditing.toggle()}, label: { indirectEdit.image })
             }
         } else {
-            Text(formatter(value))
-                .frame(maxWidth: .infinity, alignment: alignment)
-                .contentShape(Rectangle())
-                .onTapGesture(count: editClick, perform: {
-                    guard editClick < Int.max else { return }
-                    toggleUnderEditing()
-                })
+            LabeledContent(content: {
+                Text(formatter(value))
+            }, label: {
+                Text(labelString ?? "")
+            })
+            .frame(maxWidth: .infinity, alignment: alignment)
+            .contentShape(Rectangle())
+            .onTapGesture(count: editClick, perform: {
+                guard editClick < Int.max else { return }
+                toggleUnderEditing()
+            })
         }
     }
     
